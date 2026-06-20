@@ -1,0 +1,5078 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HydroFresh Market - App Jualan Sayur Hidroponik</title>
+  <meta name="description" content="Single HTML app untuk jualan sayur hidroponik: katalog, keranjang, checkout WhatsApp, riwayat pesanan, dan admin sederhana." />
+  <style>
+    :root {
+      --green-50: #effdf4;
+      --green-100: #dcfce7;
+      --green-200: #bbf7d0;
+      --green-300: #86efac;
+      --green-400: #4ade80;
+      --green-500: #22c55e;
+      --green-600: #16a34a;
+      --green-700: #15803d;
+      --green-800: #166534;
+      --green-900: #14532d;
+      --lime-50: #f7fee7;
+      --lime-100: #ecfccb;
+      --lime-200: #d9f99d;
+      --lime-300: #bef264;
+      --lime-400: #a3e635;
+      --lime-500: #84cc16;
+      --lime-600: #65a30d;
+      --mint: #9fffc5;
+      --dark: #0f172a;
+      --muted: #64748b;
+      --light: #f8fafc;
+      --white: #ffffff;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 12px 28px rgba(15, 23, 42, 0.12);
+      --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.18);
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --radius-full: 999px;
+      --border: 1px solid rgba(15, 23, 42, 0.08);
+      --transition: 180ms ease;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--dark);
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 34rem),
+        radial-gradient(circle at top right, rgba(132, 204, 22, 0.18), transparent 28rem),
+        linear-gradient(180deg, #f7fee7 0%, #f8fafc 36%, #ffffff 100%);
+      min-height: 100vh;
+    }
+    body.dark {
+      --dark: #f8fafc;
+      --muted: #cbd5e1;
+      --light: #0f172a;
+      --white: #111827;
+      --border: 1px solid rgba(255, 255, 255, 0.12);
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.16), transparent 34rem),
+        radial-gradient(circle at top right, rgba(132, 204, 22, 0.12), transparent 28rem),
+        linear-gradient(180deg, #06130b 0%, #0f172a 45%, #111827 100%);
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+    }
+    .app-shell {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.74);
+      border-bottom: var(--border);
+    }
+    body.dark .topbar {
+      background: rgba(15, 23, 42, 0.72);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      font-size: clamp(20px, 3vw, 28px);
+    }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--green-500), var(--lime-400));
+      color: #052e16;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.68);
+      border: var(--border);
+    }
+    body.dark .nav-links {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .nav-link {
+      border: 0;
+      background: transparent;
+      padding: 10px 14px;
+      border-radius: var(--radius-full);
+      color: var(--muted);
+      transition: var(--transition);
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      background: var(--green-100);
+      color: var(--green-900);
+    }
+    body.dark .nav-link:hover,
+    body.dark .nav-link.active {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--green-200);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .icon-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      border: var(--border);
+      background: var(--white);
+      color: var(--dark);
+      display: grid;
+      place-items: center;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .icon-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .cart-badge {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--red);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      border: 2px solid var(--white);
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      gap: 34px;
+      align-items: center;
+      padding: 42px 0 34px;
+    }
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 9px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--green-800);
+      font-weight: 800;
+      border: 1px solid rgba(34, 197, 94, 0.22);
+    }
+    body.dark .eyebrow {
+      color: var(--green-200);
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(40px, 7vw, 78px);
+      line-height: 0.92;
+      letter-spacing: -0.07em;
+    }
+    .hero h1 span {
+      color: var(--green-600);
+    }
+    .hero p {
+      max-width: 680px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 13px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 800;
+      transition: var(--transition);
+      min-height: 48px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--green-600), var(--lime-500));
+      color: white;
+      box-shadow: 0 16px 30px rgba(22, 163, 74, 0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 40px rgba(22, 163, 74, 0.32);
+    }
+    .btn-outline {
+      background: var(--white);
+      color: var(--dark);
+      border: var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-outline:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #b91c1c;
+      border: 1px solid rgba(239, 68, 68, 0.18);
+    }
+    .btn-small {
+      min-height: 38px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+    .hero-card {
+      position: relative;
+      border-radius: 36px;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.54)),
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.2), transparent 20rem);
+      border: var(--border);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    body.dark .hero-card {
+      background:
+        linear-gradient(135deg, rgba(17, 24, 39, 0.9), rgba(15, 23, 42, 0.74)),
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), transparent 20rem);
+    }
+    .hero-card:before {
+      content: "";
+      position: absolute;
+      inset: auto -60px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(132, 204, 22, 0.34);
+      filter: blur(8px);
+    }
+    .farm-visual {
+      position: relative;
+      min-height: 390px;
+      display: grid;
+      align-content: end;
+      gap: 14px;
+    }
+    .farm-shelf {
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.75);
+      border: var(--border);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    body.dark .farm-shelf {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .farm-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+    .plant {
+      aspect-ratio: 1;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green-100), var(--lime-100));
+      border: 1px solid rgba(22, 163, 74, 0.16);
+      font-size: 26px;
+      animation: floatPlant 5s ease-in-out infinite;
+    }
+    .plant:nth-child(2n) {
+      animation-delay: 0.45s;
+    }
+    .plant:nth-child(3n) {
+      animation-delay: 0.9s;
+    }
+    @keyframes floatPlant {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+    .floating-card {
+      position: absolute;
+      z-index: 2;
+      background: var(--white);
+      border: var(--border);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow-md);
+      display: grid;
+      gap: 6px;
+      min-width: 170px;
+    }
+    .floating-card strong {
+      font-size: 18px;
+    }
+    .floating-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .floating-card.one {
+      top: 10px;
+      left: 10px;
+    }
+    .floating-card.two {
+      right: 10px;
+      top: 82px;
+    }
+    .floating-card.three {
+      bottom: 18px;
+      left: 28px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 26px 0 40px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      gap: 6px;
+    }
+    .stat-card strong {
+      font-size: clamp(24px, 4vw, 36px);
+      letter-spacing: -0.05em;
+    }
+    .stat-card span {
+      color: var(--muted);
+    }
+    .section {
+      padding: 40px 0;
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    .section-title {
+      display: grid;
+      gap: 8px;
+    }
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 48px);
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 700px;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 170px 170px auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: var(--border);
+      background: var(--white);
+      color: var(--dark);
+      border-radius: 16px;
+      min-height: 48px;
+      padding: 12px 14px;
+      outline: none;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: rgba(34, 197, 94, 0.45);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+    }
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .chip {
+      border: var(--border);
+      background: var(--white);
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: var(--radius-full);
+      font-weight: 800;
+      transition: var(--transition);
+    }
+    .chip:hover,
+    .chip.active {
+      color: var(--green-900);
+      background: var(--green-100);
+      border-color: rgba(34, 197, 94, 0.28);
+    }
+    body.dark .chip:hover,
+    body.dark .chip.active {
+      color: var(--green-200);
+      background: rgba(34, 197, 94, 0.18);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .product-card {
+      position: relative;
+      background: var(--white);
+      border: var(--border);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      transition: var(--transition);
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+    .product-visual {
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.88), transparent 40%),
+        linear-gradient(135deg, var(--green-100), var(--lime-100));
+      font-size: 70px;
+      position: relative;
+    }
+    .product-tag {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      border-radius: var(--radius-full);
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--green-800);
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .stock-pill {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      border-radius: var(--radius-full);
+      padding: 7px 10px;
+      background: rgba(15, 23, 42, 0.78);
+      color: white;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .stock-pill.low {
+      background: rgba(245, 158, 11, 0.95);
+    }
+    .stock-pill.empty {
+      background: rgba(239, 68, 68, 0.95);
+    }
+    .product-body {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .product-name {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+    }
+    .product-desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      min-height: 44px;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .price {
+      font-weight: 1000;
+      font-size: 20px;
+      letter-spacing: -0.04em;
+      color: var(--green-700);
+    }
+    body.dark .price {
+      color: var(--green-300);
+    }
+    .qty-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .qty-btn {
+      border: var(--border);
+      background: var(--light);
+      color: var(--dark);
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      font-weight: 900;
+    }
+    .qty-display {
+      text-align: center;
+      font-weight: 900;
+    }
+    .cart-drawer {
+      position: fixed;
+      z-index: 90;
+      inset: 0 0 0 auto;
+      width: min(460px, 100%);
+      background: var(--white);
+      box-shadow: var(--shadow-lg);
+      transform: translateX(105%);
+      transition: 240ms ease;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      border-left: var(--border);
+    }
+    .cart-drawer.open {
+      transform: translateX(0);
+    }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.48);
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer-head {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: var(--border);
+    }
+    .drawer-head h3 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.05em;
+    }
+    .cart-items {
+      overflow: auto;
+      padding: 16px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      border: var(--border);
+      border-radius: 20px;
+      padding: 12px;
+      background: var(--light);
+    }
+    .cart-emoji {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: var(--white);
+      font-size: 28px;
+    }
+    .cart-item h4 {
+      margin: 0 0 5px;
+      letter-spacing: -0.03em;
+    }
+    .cart-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .drawer-foot {
+      border-top: var(--border);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      background: var(--white);
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+    }
+    .summary-line strong {
+      color: var(--dark);
+      font-size: 18px;
+    }
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .panel {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .panel h3 {
+      margin: 0 0 14px;
+      letter-spacing: -0.04em;
+      font-size: 24px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+    .order-preview {
+      display: grid;
+      gap: 10px;
+    }
+    .preview-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: var(--border);
+    }
+    .preview-item:last-child {
+      border-bottom: 0;
+    }
+    .coupon-box {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 38px 18px;
+      color: var(--muted);
+      border: 1px dashed rgba(100, 116, 139, 0.35);
+      border-radius: 24px;
+      background: rgba(100, 116, 139, 0.06);
+    }
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+    .timeline-step {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 14px;
+      align-items: start;
+      position: relative;
+    }
+    .timeline-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--green-600), var(--lime-400));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 1000;
+    }
+    .timeline-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .timeline-card h4 {
+      margin: 0 0 6px;
+      letter-spacing: -0.03em;
+    }
+    .timeline-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .feature-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      gap: 12px;
+    }
+    .feature-icon {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: var(--green-100);
+      color: var(--green-800);
+      font-size: 24px;
+    }
+    .feature-card h3 {
+      margin: 0;
+      letter-spacing: -0.04em;
+      font-size: 22px;
+    }
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 18px;
+    }
+    .table-wrap {
+      overflow: auto;
+      border: var(--border);
+      border-radius: 22px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      background: var(--white);
+    }
+    th,
+    td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: var(--border);
+      font-size: 14px;
+    }
+    th {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 11px;
+      background: rgba(100, 116, 139, 0.06);
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-full);
+      padding: 6px 9px;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .status.ok {
+      background: var(--green-100);
+      color: var(--green-800);
+    }
+    .status.warn {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status.danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .faq-list {
+      display: grid;
+      gap: 12px;
+    }
+    details {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 22px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    details p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .testimonial-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      gap: 12px;
+    }
+    .stars {
+      color: var(--amber);
+      letter-spacing: 2px;
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    .blog-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      gap: 10px;
+    }
+    .blog-card h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+    }
+    .blog-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .footer {
+      padding: 34px 0;
+      color: var(--muted);
+      border-top: var(--border);
+      margin-top: 40px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr;
+      gap: 24px;
+    }
+    .footer h3,
+    .footer h4 {
+      color: var(--dark);
+      margin-top: 0;
+    }
+    .toast {
+      position: fixed;
+      z-index: 120;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      gap: 10px;
+      width: min(360px, calc(100% - 36px));
+    }
+    .toast-message {
+      background: var(--dark);
+      color: var(--white);
+      padding: 14px 16px;
+      border-radius: 18px;
+      box-shadow: var(--shadow-lg);
+      animation: slideToast 240ms ease;
+    }
+    body.dark .toast-message {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    @keyframes slideToast {
+      from {
+        transform: translateY(12px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .mobile-menu {
+      display: none;
+    }
+    .m-0 {
+      margin: 0px;
+    }
+    .mt-0 {
+      margin-top: 0px;
+    }
+    .mb-0 {
+      margin-bottom: 0px;
+    }
+    .ml-0 {
+      margin-left: 0px;
+    }
+    .mr-0 {
+      margin-right: 0px;
+    }
+    .p-0 {
+      padding: 0px;
+    }
+    .pt-0 {
+      padding-top: 0px;
+    }
+    .pb-0 {
+      padding-bottom: 0px;
+    }
+    .pl-0 {
+      padding-left: 0px;
+    }
+    .pr-0 {
+      padding-right: 0px;
+    }
+    .gap-0 {
+      gap: 0px;
+    }
+    .m-4 {
+      margin: 4px;
+    }
+    .mt-4 {
+      margin-top: 4px;
+    }
+    .mb-4 {
+      margin-bottom: 4px;
+    }
+    .ml-4 {
+      margin-left: 4px;
+    }
+    .mr-4 {
+      margin-right: 4px;
+    }
+    .p-4 {
+      padding: 4px;
+    }
+    .pt-4 {
+      padding-top: 4px;
+    }
+    .pb-4 {
+      padding-bottom: 4px;
+    }
+    .pl-4 {
+      padding-left: 4px;
+    }
+    .pr-4 {
+      padding-right: 4px;
+    }
+    .gap-4 {
+      gap: 4px;
+    }
+    .m-8 {
+      margin: 8px;
+    }
+    .mt-8 {
+      margin-top: 8px;
+    }
+    .mb-8 {
+      margin-bottom: 8px;
+    }
+    .ml-8 {
+      margin-left: 8px;
+    }
+    .mr-8 {
+      margin-right: 8px;
+    }
+    .p-8 {
+      padding: 8px;
+    }
+    .pt-8 {
+      padding-top: 8px;
+    }
+    .pb-8 {
+      padding-bottom: 8px;
+    }
+    .pl-8 {
+      padding-left: 8px;
+    }
+    .pr-8 {
+      padding-right: 8px;
+    }
+    .gap-8 {
+      gap: 8px;
+    }
+    .m-12 {
+      margin: 12px;
+    }
+    .mt-12 {
+      margin-top: 12px;
+    }
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+    .ml-12 {
+      margin-left: 12px;
+    }
+    .mr-12 {
+      margin-right: 12px;
+    }
+    .p-12 {
+      padding: 12px;
+    }
+    .pt-12 {
+      padding-top: 12px;
+    }
+    .pb-12 {
+      padding-bottom: 12px;
+    }
+    .pl-12 {
+      padding-left: 12px;
+    }
+    .pr-12 {
+      padding-right: 12px;
+    }
+    .gap-12 {
+      gap: 12px;
+    }
+    .m-16 {
+      margin: 16px;
+    }
+    .mt-16 {
+      margin-top: 16px;
+    }
+    .mb-16 {
+      margin-bottom: 16px;
+    }
+    .ml-16 {
+      margin-left: 16px;
+    }
+    .mr-16 {
+      margin-right: 16px;
+    }
+    .p-16 {
+      padding: 16px;
+    }
+    .pt-16 {
+      padding-top: 16px;
+    }
+    .pb-16 {
+      padding-bottom: 16px;
+    }
+    .pl-16 {
+      padding-left: 16px;
+    }
+    .pr-16 {
+      padding-right: 16px;
+    }
+    .gap-16 {
+      gap: 16px;
+    }
+    .m-20 {
+      margin: 20px;
+    }
+    .mt-20 {
+      margin-top: 20px;
+    }
+    .mb-20 {
+      margin-bottom: 20px;
+    }
+    .ml-20 {
+      margin-left: 20px;
+    }
+    .mr-20 {
+      margin-right: 20px;
+    }
+    .p-20 {
+      padding: 20px;
+    }
+    .pt-20 {
+      padding-top: 20px;
+    }
+    .pb-20 {
+      padding-bottom: 20px;
+    }
+    .pl-20 {
+      padding-left: 20px;
+    }
+    .pr-20 {
+      padding-right: 20px;
+    }
+    .gap-20 {
+      gap: 20px;
+    }
+    .m-24 {
+      margin: 24px;
+    }
+    .mt-24 {
+      margin-top: 24px;
+    }
+    .mb-24 {
+      margin-bottom: 24px;
+    }
+    .ml-24 {
+      margin-left: 24px;
+    }
+    .mr-24 {
+      margin-right: 24px;
+    }
+    .p-24 {
+      padding: 24px;
+    }
+    .pt-24 {
+      padding-top: 24px;
+    }
+    .pb-24 {
+      padding-bottom: 24px;
+    }
+    .pl-24 {
+      padding-left: 24px;
+    }
+    .pr-24 {
+      padding-right: 24px;
+    }
+    .gap-24 {
+      gap: 24px;
+    }
+    .m-28 {
+      margin: 28px;
+    }
+    .mt-28 {
+      margin-top: 28px;
+    }
+    .mb-28 {
+      margin-bottom: 28px;
+    }
+    .ml-28 {
+      margin-left: 28px;
+    }
+    .mr-28 {
+      margin-right: 28px;
+    }
+    .p-28 {
+      padding: 28px;
+    }
+    .pt-28 {
+      padding-top: 28px;
+    }
+    .pb-28 {
+      padding-bottom: 28px;
+    }
+    .pl-28 {
+      padding-left: 28px;
+    }
+    .pr-28 {
+      padding-right: 28px;
+    }
+    .gap-28 {
+      gap: 28px;
+    }
+    .m-32 {
+      margin: 32px;
+    }
+    .mt-32 {
+      margin-top: 32px;
+    }
+    .mb-32 {
+      margin-bottom: 32px;
+    }
+    .ml-32 {
+      margin-left: 32px;
+    }
+    .mr-32 {
+      margin-right: 32px;
+    }
+    .p-32 {
+      padding: 32px;
+    }
+    .pt-32 {
+      padding-top: 32px;
+    }
+    .pb-32 {
+      padding-bottom: 32px;
+    }
+    .pl-32 {
+      padding-left: 32px;
+    }
+    .pr-32 {
+      padding-right: 32px;
+    }
+    .gap-32 {
+      gap: 32px;
+    }
+    .m-36 {
+      margin: 36px;
+    }
+    .mt-36 {
+      margin-top: 36px;
+    }
+    .mb-36 {
+      margin-bottom: 36px;
+    }
+    .ml-36 {
+      margin-left: 36px;
+    }
+    .mr-36 {
+      margin-right: 36px;
+    }
+    .p-36 {
+      padding: 36px;
+    }
+    .pt-36 {
+      padding-top: 36px;
+    }
+    .pb-36 {
+      padding-bottom: 36px;
+    }
+    .pl-36 {
+      padding-left: 36px;
+    }
+    .pr-36 {
+      padding-right: 36px;
+    }
+    .gap-36 {
+      gap: 36px;
+    }
+    .m-40 {
+      margin: 40px;
+    }
+    .mt-40 {
+      margin-top: 40px;
+    }
+    .mb-40 {
+      margin-bottom: 40px;
+    }
+    .ml-40 {
+      margin-left: 40px;
+    }
+    .mr-40 {
+      margin-right: 40px;
+    }
+    .p-40 {
+      padding: 40px;
+    }
+    .pt-40 {
+      padding-top: 40px;
+    }
+    .pb-40 {
+      padding-bottom: 40px;
+    }
+    .pl-40 {
+      padding-left: 40px;
+    }
+    .pr-40 {
+      padding-right: 40px;
+    }
+    .gap-40 {
+      gap: 40px;
+    }
+    .m-44 {
+      margin: 44px;
+    }
+    .mt-44 {
+      margin-top: 44px;
+    }
+    .mb-44 {
+      margin-bottom: 44px;
+    }
+    .ml-44 {
+      margin-left: 44px;
+    }
+    .mr-44 {
+      margin-right: 44px;
+    }
+    .p-44 {
+      padding: 44px;
+    }
+    .pt-44 {
+      padding-top: 44px;
+    }
+    .pb-44 {
+      padding-bottom: 44px;
+    }
+    .pl-44 {
+      padding-left: 44px;
+    }
+    .pr-44 {
+      padding-right: 44px;
+    }
+    .gap-44 {
+      gap: 44px;
+    }
+    .m-48 {
+      margin: 48px;
+    }
+    .mt-48 {
+      margin-top: 48px;
+    }
+    .mb-48 {
+      margin-bottom: 48px;
+    }
+    .ml-48 {
+      margin-left: 48px;
+    }
+    .mr-48 {
+      margin-right: 48px;
+    }
+    .p-48 {
+      padding: 48px;
+    }
+    .pt-48 {
+      padding-top: 48px;
+    }
+    .pb-48 {
+      padding-bottom: 48px;
+    }
+    .pl-48 {
+      padding-left: 48px;
+    }
+    .pr-48 {
+      padding-right: 48px;
+    }
+    .gap-48 {
+      gap: 48px;
+    }
+    .m-52 {
+      margin: 52px;
+    }
+    .mt-52 {
+      margin-top: 52px;
+    }
+    .mb-52 {
+      margin-bottom: 52px;
+    }
+    .ml-52 {
+      margin-left: 52px;
+    }
+    .mr-52 {
+      margin-right: 52px;
+    }
+    .p-52 {
+      padding: 52px;
+    }
+    .pt-52 {
+      padding-top: 52px;
+    }
+    .pb-52 {
+      padding-bottom: 52px;
+    }
+    .pl-52 {
+      padding-left: 52px;
+    }
+    .pr-52 {
+      padding-right: 52px;
+    }
+    .gap-52 {
+      gap: 52px;
+    }
+    .m-56 {
+      margin: 56px;
+    }
+    .mt-56 {
+      margin-top: 56px;
+    }
+    .mb-56 {
+      margin-bottom: 56px;
+    }
+    .ml-56 {
+      margin-left: 56px;
+    }
+    .mr-56 {
+      margin-right: 56px;
+    }
+    .p-56 {
+      padding: 56px;
+    }
+    .pt-56 {
+      padding-top: 56px;
+    }
+    .pb-56 {
+      padding-bottom: 56px;
+    }
+    .pl-56 {
+      padding-left: 56px;
+    }
+    .pr-56 {
+      padding-right: 56px;
+    }
+    .gap-56 {
+      gap: 56px;
+    }
+    .m-60 {
+      margin: 60px;
+    }
+    .mt-60 {
+      margin-top: 60px;
+    }
+    .mb-60 {
+      margin-bottom: 60px;
+    }
+    .ml-60 {
+      margin-left: 60px;
+    }
+    .mr-60 {
+      margin-right: 60px;
+    }
+    .p-60 {
+      padding: 60px;
+    }
+    .pt-60 {
+      padding-top: 60px;
+    }
+    .pb-60 {
+      padding-bottom: 60px;
+    }
+    .pl-60 {
+      padding-left: 60px;
+    }
+    .pr-60 {
+      padding-right: 60px;
+    }
+    .gap-60 {
+      gap: 60px;
+    }
+    .m-64 {
+      margin: 64px;
+    }
+    .mt-64 {
+      margin-top: 64px;
+    }
+    .mb-64 {
+      margin-bottom: 64px;
+    }
+    .ml-64 {
+      margin-left: 64px;
+    }
+    .mr-64 {
+      margin-right: 64px;
+    }
+    .p-64 {
+      padding: 64px;
+    }
+    .pt-64 {
+      padding-top: 64px;
+    }
+    .pb-64 {
+      padding-bottom: 64px;
+    }
+    .pl-64 {
+      padding-left: 64px;
+    }
+    .pr-64 {
+      padding-right: 64px;
+    }
+    .gap-64 {
+      gap: 64px;
+    }
+    .m-68 {
+      margin: 68px;
+    }
+    .mt-68 {
+      margin-top: 68px;
+    }
+    .mb-68 {
+      margin-bottom: 68px;
+    }
+    .ml-68 {
+      margin-left: 68px;
+    }
+    .mr-68 {
+      margin-right: 68px;
+    }
+    .p-68 {
+      padding: 68px;
+    }
+    .pt-68 {
+      padding-top: 68px;
+    }
+    .pb-68 {
+      padding-bottom: 68px;
+    }
+    .pl-68 {
+      padding-left: 68px;
+    }
+    .pr-68 {
+      padding-right: 68px;
+    }
+    .gap-68 {
+      gap: 68px;
+    }
+    .m-72 {
+      margin: 72px;
+    }
+    .mt-72 {
+      margin-top: 72px;
+    }
+    .mb-72 {
+      margin-bottom: 72px;
+    }
+    .ml-72 {
+      margin-left: 72px;
+    }
+    .mr-72 {
+      margin-right: 72px;
+    }
+    .p-72 {
+      padding: 72px;
+    }
+    .pt-72 {
+      padding-top: 72px;
+    }
+    .pb-72 {
+      padding-bottom: 72px;
+    }
+    .pl-72 {
+      padding-left: 72px;
+    }
+    .pr-72 {
+      padding-right: 72px;
+    }
+    .gap-72 {
+      gap: 72px;
+    }
+    .m-76 {
+      margin: 76px;
+    }
+    .mt-76 {
+      margin-top: 76px;
+    }
+    .mb-76 {
+      margin-bottom: 76px;
+    }
+    .ml-76 {
+      margin-left: 76px;
+    }
+    .mr-76 {
+      margin-right: 76px;
+    }
+    .p-76 {
+      padding: 76px;
+    }
+    .pt-76 {
+      padding-top: 76px;
+    }
+    .pb-76 {
+      padding-bottom: 76px;
+    }
+    .pl-76 {
+      padding-left: 76px;
+    }
+    .pr-76 {
+      padding-right: 76px;
+    }
+    .gap-76 {
+      gap: 76px;
+    }
+    .m-80 {
+      margin: 80px;
+    }
+    .mt-80 {
+      margin-top: 80px;
+    }
+    .mb-80 {
+      margin-bottom: 80px;
+    }
+    .ml-80 {
+      margin-left: 80px;
+    }
+    .mr-80 {
+      margin-right: 80px;
+    }
+    .p-80 {
+      padding: 80px;
+    }
+    .pt-80 {
+      padding-top: 80px;
+    }
+    .pb-80 {
+      padding-bottom: 80px;
+    }
+    .pl-80 {
+      padding-left: 80px;
+    }
+    .pr-80 {
+      padding-right: 80px;
+    }
+    .gap-80 {
+      gap: 80px;
+    }
+    .text-green {
+      color: var(--green-600);
+    }
+    .bg-green {
+      background: var(--green-600);
+    }
+    .text-lime {
+      color: var(--lime-500);
+    }
+    .bg-lime {
+      background: var(--lime-500);
+    }
+    .text-dark {
+      color: var(--dark);
+    }
+    .bg-dark {
+      background: var(--dark);
+    }
+    .text-muted {
+      color: var(--muted);
+    }
+    .bg-muted {
+      background: var(--muted);
+    }
+    .text-white {
+      color: var(--white);
+    }
+    .bg-white {
+      background: var(--white);
+    }
+    .text-amber {
+      color: var(--amber);
+    }
+    .bg-amber {
+      background: var(--amber);
+    }
+    .text-red {
+      color: var(--red);
+    }
+    .bg-red {
+      background: var(--red);
+    }
+    .text-blue {
+      color: var(--blue);
+    }
+    .bg-blue {
+      background: var(--blue);
+    }
+    .text-purple {
+      color: var(--purple);
+    }
+    .bg-purple {
+      background: var(--purple);
+    }
+    .leaf-card-variant-1 {
+      border-radius: 13px;
+      box-shadow: 0 5px 13px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-2 {
+      border-radius: 14px;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-3 {
+      border-radius: 15px;
+      box-shadow: 0 7px 15px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-4 {
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-5 {
+      border-radius: 17px;
+      box-shadow: 0 9px 17px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-6 {
+      border-radius: 18px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-7 {
+      border-radius: 19px;
+      box-shadow: 0 11px 19px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-8 {
+      border-radius: 20px;
+      box-shadow: 0 12px 20px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-9 {
+      border-radius: 21px;
+      box-shadow: 0 13px 21px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-10 {
+      border-radius: 22px;
+      box-shadow: 0 14px 22px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-11 {
+      border-radius: 23px;
+      box-shadow: 0 15px 23px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-12 {
+      border-radius: 24px;
+      box-shadow: 0 16px 24px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-13 {
+      border-radius: 25px;
+      box-shadow: 0 17px 25px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-14 {
+      border-radius: 26px;
+      box-shadow: 0 18px 26px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-15 {
+      border-radius: 27px;
+      box-shadow: 0 19px 27px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-16 {
+      border-radius: 12px;
+      box-shadow: 0 20px 28px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-17 {
+      border-radius: 13px;
+      box-shadow: 0 21px 29px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-18 {
+      border-radius: 14px;
+      box-shadow: 0 4px 30px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-19 {
+      border-radius: 15px;
+      box-shadow: 0 5px 31px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-20 {
+      border-radius: 16px;
+      box-shadow: 0 6px 32px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-21 {
+      border-radius: 17px;
+      box-shadow: 0 7px 33px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-22 {
+      border-radius: 18px;
+      box-shadow: 0 8px 34px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-23 {
+      border-radius: 19px;
+      box-shadow: 0 9px 35px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-24 {
+      border-radius: 20px;
+      box-shadow: 0 10px 36px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-25 {
+      border-radius: 21px;
+      box-shadow: 0 11px 37px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-26 {
+      border-radius: 22px;
+      box-shadow: 0 12px 38px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-27 {
+      border-radius: 23px;
+      box-shadow: 0 13px 39px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-28 {
+      border-radius: 24px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-29 {
+      border-radius: 25px;
+      box-shadow: 0 15px 41px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-30 {
+      border-radius: 26px;
+      box-shadow: 0 16px 42px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-31 {
+      border-radius: 27px;
+      box-shadow: 0 17px 43px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-32 {
+      border-radius: 12px;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-33 {
+      border-radius: 13px;
+      box-shadow: 0 19px 45px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-34 {
+      border-radius: 14px;
+      box-shadow: 0 20px 46px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-35 {
+      border-radius: 15px;
+      box-shadow: 0 21px 47px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-36 {
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-37 {
+      border-radius: 17px;
+      box-shadow: 0 5px 13px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-38 {
+      border-radius: 18px;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-39 {
+      border-radius: 19px;
+      box-shadow: 0 7px 15px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-40 {
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-41 {
+      border-radius: 21px;
+      box-shadow: 0 9px 17px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-42 {
+      border-radius: 22px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-43 {
+      border-radius: 23px;
+      box-shadow: 0 11px 19px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-44 {
+      border-radius: 24px;
+      box-shadow: 0 12px 20px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-45 {
+      border-radius: 25px;
+      box-shadow: 0 13px 21px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-46 {
+      border-radius: 26px;
+      box-shadow: 0 14px 22px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-47 {
+      border-radius: 27px;
+      box-shadow: 0 15px 23px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-48 {
+      border-radius: 12px;
+      box-shadow: 0 16px 24px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-49 {
+      border-radius: 13px;
+      box-shadow: 0 17px 25px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-50 {
+      border-radius: 14px;
+      box-shadow: 0 18px 26px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-51 {
+      border-radius: 15px;
+      box-shadow: 0 19px 27px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-52 {
+      border-radius: 16px;
+      box-shadow: 0 20px 28px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-53 {
+      border-radius: 17px;
+      box-shadow: 0 21px 29px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-54 {
+      border-radius: 18px;
+      box-shadow: 0 4px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-55 {
+      border-radius: 19px;
+      box-shadow: 0 5px 31px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-56 {
+      border-radius: 20px;
+      box-shadow: 0 6px 32px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-57 {
+      border-radius: 21px;
+      box-shadow: 0 7px 33px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-58 {
+      border-radius: 22px;
+      box-shadow: 0 8px 34px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-59 {
+      border-radius: 23px;
+      box-shadow: 0 9px 35px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-60 {
+      border-radius: 24px;
+      box-shadow: 0 10px 36px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-61 {
+      border-radius: 25px;
+      box-shadow: 0 11px 37px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-62 {
+      border-radius: 26px;
+      box-shadow: 0 12px 38px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-63 {
+      border-radius: 27px;
+      box-shadow: 0 13px 39px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-64 {
+      border-radius: 12px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-65 {
+      border-radius: 13px;
+      box-shadow: 0 15px 41px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-66 {
+      border-radius: 14px;
+      box-shadow: 0 16px 42px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-67 {
+      border-radius: 15px;
+      box-shadow: 0 17px 43px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-68 {
+      border-radius: 16px;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-69 {
+      border-radius: 17px;
+      box-shadow: 0 19px 45px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-70 {
+      border-radius: 18px;
+      box-shadow: 0 20px 46px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-71 {
+      border-radius: 19px;
+      box-shadow: 0 21px 47px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-72 {
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-73 {
+      border-radius: 21px;
+      box-shadow: 0 5px 13px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    .leaf-card-variant-74 {
+      border-radius: 22px;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+    }
+    .leaf-card-variant-75 {
+      border-radius: 23px;
+      box-shadow: 0 7px 15px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.13);
+    }
+    .leaf-card-variant-76 {
+      border-radius: 24px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(22, 163, 74, 0.14);
+    }
+    .leaf-card-variant-77 {
+      border-radius: 25px;
+      box-shadow: 0 9px 17px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(22, 163, 74, 0.08);
+    }
+    .leaf-card-variant-78 {
+      border-radius: 26px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.07);
+      border: 1px solid rgba(22, 163, 74, 0.09);
+    }
+    .leaf-card-variant-79 {
+      border-radius: 27px;
+      box-shadow: 0 11px 19px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(22, 163, 74, 0.10);
+    }
+    .leaf-card-variant-80 {
+      border-radius: 12px;
+      box-shadow: 0 12px 20px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(22, 163, 74, 0.11);
+    }
+    @media (max-width: 1080px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .blog-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .admin-grid,
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 760px) {
+      .app-shell {
+        width: min(100% - 20px, 1220px);
+      }
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu {
+        display: grid;
+      }
+      .hero {
+        padding-top: 24px;
+      }
+      .hero-card {
+        padding: 16px;
+        border-radius: 26px;
+      }
+      .stats,
+      .feature-grid,
+      .testimonial-grid,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+      .farm-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .floating-card {
+        position: relative;
+        inset: auto;
+        min-width: 0;
+      }
+      .farm-visual {
+        min-height: auto;
+      }
+    }
+    @media print {
+      .topbar,
+      .cart-drawer,
+      .overlay,
+      .toast,
+      .hero-actions,
+      .toolbar,
+      .category-chips,
+      .drawer-foot,
+      .btn {
+        display: none !important;
+      }
+      body {
+        background: white;
+      }
+      .panel,
+      .product-card,
+      .stat-card,
+      .feature-card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay"></div>
+  <div class="toast" id="toast"></div>
+  <header class="topbar">
+    <div class="app-shell nav">
+      <a href="#home" class="brand" aria-label="HydroFresh Market">
+        <span class="brand-icon">🌿</span>
+        <span>HydroFresh</span>
+      </a>
+      <nav class="nav-links" aria-label="Navigasi utama">
+        <a class="nav-link" href="#home">Beranda</a>
+        <a class="nav-link" href="#produk">Produk</a>
+        <a class="nav-link" href="#checkout">Checkout</a>
+        <a class="nav-link" href="#admin">Admin</a>
+        <a class="nav-link" href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-button" id="themeBtn" title="Ubah tema">🌓</button>
+        <button class="icon-button" id="cartBtn" title="Buka keranjang">🛒<span class="cart-badge" id="cartBadge">0</span></button>
+        <a class="icon-button mobile-menu" href="#produk" title="Menu">☰</a>
+      </div>
+    </div>
+  </header>
+  <main id="home" class="app-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">🌱 Panen segar • Kirim cepat • Hidroponik bersih</div>
+        <h1>Jual sayur <span>hidroponik</span> langsung dari kebun.</h1>
+        <p>App single HTML untuk bisnis sayur hidroponik: tampilkan katalog, kelola stok, hitung ongkir, gunakan voucher, simpan riwayat pesanan, dan kirim checkout ke WhatsApp.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#produk">Belanja Sekarang 🛒</a>
+          <a class="btn btn-outline" href="#admin">Kelola Produk ⚙️</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="farm-visual">
+          <div class="floating-card one"><strong>98%</strong><span>pesanan repeat buyer</span></div>
+          <div class="floating-card two"><strong>± 2 jam</strong><span>estimasi kirim lokal</span></div>
+          <div class="floating-card three"><strong>Fresh</strong><span>panen harian</span></div>
+          <div class="farm-row">
+            <div class="plant">🥬</div>
+            <div class="plant">🌿</div>
+            <div class="plant">🥦</div>
+            <div class="plant">🌱</div>
+            <div class="plant">🍅</div>
+            <div class="plant">🥒</div>
+          </div>
+          <div class="farm-row">
+            <div class="plant">🌿</div>
+            <div class="plant">🥦</div>
+            <div class="plant">🌱</div>
+            <div class="plant">🍅</div>
+            <div class="plant">🥒</div>
+            <div class="plant">🥬</div>
+          </div>
+          <div class="farm-row">
+            <div class="plant">🥦</div>
+            <div class="plant">🌱</div>
+            <div class="plant">🍅</div>
+            <div class="plant">🥒</div>
+            <div class="plant">🥬</div>
+            <div class="plant">🌿</div>
+          </div>
+          <div class="farm-row">
+            <div class="plant">🌱</div>
+            <div class="plant">🍅</div>
+            <div class="plant">🥒</div>
+            <div class="plant">🥬</div>
+            <div class="plant">🌿</div>
+            <div class="plant">🥦</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="stats" aria-label="Statistik toko">
+      <div class="stat-card"><strong>24+</strong><span>Produk aktif</span></div>
+      <div class="stat-card"><strong>06:00</strong><span>Mulai panen</span></div>
+      <div class="stat-card"><strong>4.8/5</strong><span>Rating pelanggan</span></div>
+      <div class="stat-card"><strong>100%</strong><span>Single HTML</span></div>
+    </section>
+    <section class="section" id="fitur">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Fitur toko siap pakai</h2>
+          <p>Dirancang untuk usaha sayur hidroponik rumahan, kebun kecil, reseller, atau katalog WhatsApp.</p>
+        </div>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon">🛒</div>
+          <h3>Keranjang Interaktif</h3>
+          <p>Pembeli bisa tambah, kurang, dan hapus item sebelum checkout.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">📲</div>
+          <h3>Checkout WhatsApp</h3>
+          <p>Pesanan otomatis dirangkai menjadi teks yang rapi untuk dikirim ke admin.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Manajemen Stok</h3>
+          <p>Admin bisa tambah produk, ubah harga, dan melihat status stok.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">🎟️</div>
+          <h3>Voucher Diskon</h3>
+          <p>Kode voucher bisa dipakai untuk promo pelanggan setia.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">🧾</div>
+          <h3>Riwayat Pesanan</h3>
+          <p>Order disimpan di localStorage browser sebagai arsip lokal.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">🌗</div>
+          <h3>Tema Gelap/Terang</h3>
+          <p>Tampilan bisa diganti sesuai kebutuhan presentasi toko.</p>
+        </article>
+      </div>
+    </section>
+    <section class="section" id="produk">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Katalog Produk</h2>
+          <p>Cari sayur, filter kategori, urutkan harga, lalu masukkan ke keranjang belanja.</p>
+        </div>
+        <button class="btn btn-outline" id="resetCatalogBtn">Reset Filter</button>
+      </div>
+      <div class="toolbar">
+        <div class="field"><label for="searchInput">Cari produk</label><input class="input" id="searchInput" placeholder="Contoh: selada, pakcoy, microgreens..." /></div>
+        <div class="field"><label for="sortSelect">Urutkan</label><select class="select" id="sortSelect"><option value="popular">Terpopuler</option><option value="priceAsc">Harga termurah</option><option value="priceDesc">Harga termahal</option><option value="stockDesc">Stok terbanyak</option><option value="ratingDesc">Rating tertinggi</option></select></div>
+        <div class="field"><label for="stockSelect">Stok</label><select class="select" id="stockSelect"><option value="all">Semua</option><option value="ready">Tersedia</option><option value="low">Stok tipis</option><option value="empty">Habis</option></select></div>
+        <button class="btn btn-primary" id="scrollCheckoutBtn">Checkout</button>
+      </div>
+      <div class="category-chips" id="categoryChips"></div>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+    <section class="section" id="checkout">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Checkout Pesanan</h2>
+          <p>Lengkapi data pelanggan. Pesanan bisa disimpan lokal atau dikirim langsung ke WhatsApp admin.</p>
+        </div>
+      </div>
+      <div class="checkout-grid">
+        <form class="panel" id="checkoutForm">
+          <h3>Data Pelanggan</h3>
+          <div class="form-grid">
+            <div class="field"><label>Nama</label><input class="input" id="customerName" required placeholder="Nama pelanggan" /></div>
+            <div class="field"><label>Nomor HP</label><input class="input" id="customerPhone" required placeholder="08xxxxxxxxxx" /></div>
+            <div class="field"><label>Kecamatan</label><input class="input" id="customerArea" placeholder="Contoh: Panakkukang" /></div>
+            <div class="field"><label>Metode bayar</label><select class="select" id="paymentMethod"><option>COD</option><option>Transfer Bank</option><option>QRIS</option><option>E-Wallet</option></select></div>
+            <div class="field full"><label>Alamat pengiriman</label><textarea class="textarea" id="customerAddress" required placeholder="Tulis alamat lengkap, patokan, dan jam diterima"></textarea></div>
+            <div class="field full"><label>Catatan pesanan</label><textarea class="textarea" id="orderNote" placeholder="Contoh: pilih daun yang muda, kirim sore, atau langganan mingguan"></textarea></div>
+            <div class="field"><label>Ongkir</label><input class="input" id="shippingFee" type="number" value="10000" min="0" /></div>
+            <div class="field"><label>Kode voucher</label><div class="coupon-box"><input class="input" id="couponInput" placeholder="HEMAT10 / FRESH5" /><button class="btn btn-outline btn-small" type="button" id="applyCouponBtn">Pakai</button></div></div>
+          </div>
+          <div class="hero-actions mt-16">
+            <button class="btn btn-primary" type="submit">Kirim ke WhatsApp</button>
+            <button class="btn btn-outline" type="button" id="saveOrderBtn">Simpan Order</button>
+            <button class="btn btn-danger" type="button" id="clearCartBtn">Kosongkan</button>
+          </div>
+        </form>
+        <aside class="panel">
+          <h3>Ringkasan</h3>
+          <div class="order-preview" id="orderPreview"></div>
+          <div class="summary-line mt-12"><span>Subtotal</span><strong id="subtotalText">Rp0</strong></div>
+          <div class="summary-line"><span>Diskon</span><strong id="discountText">Rp0</strong></div>
+          <div class="summary-line"><span>Ongkir</span><strong id="shippingText">Rp0</strong></div>
+          <div class="summary-line"><span>Total</span><strong id="totalText">Rp0</strong></div>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="cara-order">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Cara Order</h2>
+          <p>Alur sederhana untuk pembeli baru agar cepat paham cara belanja.</p>
+        </div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-step">
+          <div class="timeline-dot">1</div>
+          <div class="timeline-card"><h4>Pilih Produk</h4><p>Cari sayur yang diinginkan, cek stok, lalu klik tambah ke keranjang.</p></div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot">2</div>
+          <div class="timeline-card"><h4>Cek Keranjang</h4><p>Pastikan jumlah dan varian produk sudah sesuai kebutuhan.</p></div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-card"><h4>Isi Data</h4><p>Masukkan nama, nomor HP, alamat, catatan, dan metode pembayaran.</p></div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot">4</div>
+          <div class="timeline-card"><h4>Kirim Pesanan</h4><p>Klik kirim ke WhatsApp agar admin menerima format order yang rapi.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="admin">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Panel Admin Lokal</h2>
+          <p>Panel ini berjalan di browser. Data tersimpan di localStorage, cocok untuk demo, katalog internal, dan bisnis kecil.</p>
+        </div>
+        <button class="btn btn-outline" id="exportBtn">Export JSON</button>
+      </div>
+      <div class="admin-grid">
+        <form class="panel" id="productForm">
+          <h3>Tambah / Ubah Produk</h3>
+          <div class="form-grid">
+            <div class="field"><label>ID Produk</label><input class="input" id="adminId" placeholder="Auto jika kosong" /></div>
+            <div class="field"><label>Emoji</label><input class="input" id="adminEmoji" placeholder="🥬" /></div>
+            <div class="field full"><label>Nama produk</label><input class="input" id="adminName" required placeholder="Nama sayur" /></div>
+            <div class="field"><label>Kategori</label><input class="input" id="adminCat" required placeholder="Daun / Herbal" /></div>
+            <div class="field"><label>Harga</label><input class="input" id="adminPrice" type="number" required /></div>
+            <div class="field"><label>Stok</label><input class="input" id="adminStock" type="number" required /></div>
+            <div class="field"><label>Satuan</label><input class="input" id="adminUnit" placeholder="250 g" /></div>
+            <div class="field"><label>Tag</label><input class="input" id="adminTag" placeholder="Best Seller" /></div>
+            <div class="field full"><label>Deskripsi</label><textarea class="textarea" id="adminDesc" placeholder="Deskripsi singkat produk"></textarea></div>
+          </div>
+          <div class="hero-actions mt-16">
+            <button class="btn btn-primary" type="submit">Simpan Produk</button>
+            <button class="btn btn-outline" type="button" id="resetProductsBtn">Reset Produk</button>
+          </div>
+        </form>
+        <div class="panel">
+          <h3>Daftar Stok</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody id="adminTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="riwayat">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Riwayat Pesanan</h2>
+          <p>Order yang disimpan dari browser ini akan muncul di bawah.</p>
+        </div>
+        <button class="btn btn-danger" id="clearHistoryBtn">Hapus Riwayat</button>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Metode</th></tr></thead>
+            <tbody id="historyTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="edukasi">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Edukasi Pelanggan</h2>
+          <p>Konten singkat untuk meningkatkan kepercayaan pelanggan terhadap sayur hidroponik.</p>
+        </div>
+      </div>
+      <div class="blog-grid">
+        <article class="blog-card">
+          <h3>Cara Menjaga Selada Tetap Renyah</h3>
+          <p>Simpan selada di chiller dengan tisu dapur kering agar kelembapan terkontrol.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Kenapa Sayur Hidroponik Lebih Bersih?</h3>
+          <p>Karena akar tidak tumbuh di tanah, risiko kotoran menempel jauh lebih kecil.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Ide Menu Salad Murah</h3>
+          <p>Gabungkan romaine, timun, tomat cherry, dan saus sederhana dari minyak zaitun.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Tips Belanja Sayur Mingguan</h3>
+          <p>Buat daftar menu, pilih paket bundle, lalu simpan sayur sesuai kategori.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Microgreens untuk Plating</h3>
+          <p>Gunakan sedikit microgreens di atas hidangan agar tampilan lebih premium.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Pakcoy untuk MPASI</h3>
+          <p>Pilih pakcoy muda, masak hingga lembut, dan sesuaikan tekstur dengan usia anak.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Kailan ala Restoran</h3>
+          <p>Tumis kailan dengan bawang putih, sedikit saus tiram, dan api besar.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Infused Water Mint</h3>
+          <p>Campur mint, timun, dan lemon untuk minuman ringan yang segar.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Mengurangi Food Waste</h3>
+          <p>Belanja sesuai kebutuhan dan manfaatkan batang sayur untuk kaldu.</p>
+        </article>
+        <article class="blog-card">
+          <h3>Jualan Sayur Online</h3>
+          <p>Foto produk dengan cahaya alami dan tampilkan harga jelas agar pembeli percaya.</p>
+        </article>
+      </div>
+    </section>
+    <section class="section" id="testimoni">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Testimoni</h2>
+          <p>Contoh testimoni agar landing page terasa lebih meyakinkan.</p>
+        </div>
+      </div>
+      <div class="testimonial-grid">
+        <article class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>“Sayurnya bersih dan segar. Paling suka pakcoy dan tomat cherry.”</p>
+          <strong>Nadia</strong>
+        </article>
+        <article class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>“Checkout mudah, tinggal kirim ke WhatsApp. Cocok buat jualan rumahan.”</p>
+          <strong>Rafi</strong>
+        </article>
+        <article class="testimonial-card">
+          <div class="stars">★★★★☆</div>
+          <p>“Paket tumis hemat membantu stok sayur di rumah.”</p>
+          <strong>Ibu Sari</strong>
+        </article>
+        <article class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>“Microgreens-nya bagus untuk plating menu kafe.”</p>
+          <strong>Chef Dimas</strong>
+        </article>
+        <article class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>“Kangkungnya renyah dan tidak banyak tanah.”</p>
+          <strong>Maya</strong>
+        </article>
+        <article class="testimonial-card">
+          <div class="stars">★★★★☆</div>
+          <p>“Tampilan aplikasinya rapi, katalog mudah dicari.”</p>
+          <strong>Akbar</strong>
+        </article>
+      </div>
+    </section>
+    <section class="section" id="faq">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Pertanyaan Umum</h2>
+          <p>Jawaban cepat untuk calon pembeli.</p>
+        </div>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>Apakah sayur sudah dicuci?</summary>
+          <p>Sayur dipanen bersih dan dikemas rapi, tetapi tetap disarankan dicuci ulang sebelum dikonsumsi.</p>
+        </details>
+        <details>
+          <summary>Apakah bisa COD?</summary>
+          <p>Bisa, aktifkan metode pembayaran COD pada bagian checkout.</p>
+        </details>
+        <details>
+          <summary>Apakah bisa pesan untuk restoran?</summary>
+          <p>Bisa. Gunakan catatan pesanan untuk jumlah rutin atau hubungi admin via WhatsApp.</p>
+        </details>
+        <details>
+          <summary>Bagaimana cara simpan sayur?</summary>
+          <p>Simpan dalam wadah tertutup atau plastik berlubang di chiller agar tetap segar.</p>
+        </details>
+        <details>
+          <summary>Apakah ada minimum order?</summary>
+          <p>Default minimum order Rp30.000, bisa diubah di panel admin.</p>
+        </details>
+        <details>
+          <summary>Apakah bisa kirim hari yang sama?</summary>
+          <p>Bisa selama stok tersedia dan pesanan masuk sebelum jam operasional tutup.</p>
+        </details>
+        <details>
+          <summary>Apakah produk hidroponik bebas pestisida?</summary>
+          <p>Kami mengutamakan budidaya bersih dan minim pestisida, disertai kontrol kebun rutin.</p>
+        </details>
+        <details>
+          <summary>Apakah harga bisa berubah?</summary>
+          <p>Bisa, terutama karena musim, stok, dan biaya distribusi. Admin bisa mengubah data di panel.</p>
+        </details>
+        <details>
+          <summary>Apakah bisa berlangganan mingguan?</summary>
+          <p>Bisa. Pilih paket lalu tuliskan jadwal langganan pada catatan pesanan.</p>
+        </details>
+        <details>
+          <summary>Bagaimana jika stok habis?</summary>
+          <p>Produk otomatis ditandai stok tipis atau habis. Admin bisa memperbarui stok dari panel.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Keranjang belanja">
+    <div class="drawer-head">
+      <h3>Keranjang</h3>
+      <button class="icon-button" id="closeCartBtn">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="drawer-foot">
+      <div class="summary-line"><span>Item</span><strong id="drawerItemCount">0</strong></div>
+      <div class="summary-line"><span>Subtotal</span><strong id="drawerSubtotal">Rp0</strong></div>
+      <a href="#checkout" class="btn btn-primary" id="drawerCheckoutBtn">Lanjut Checkout</a>
+    </div>
+  </aside>
+  <footer class="footer">
+    <div class="app-shell footer-grid">
+      <div><h3>HydroFresh Market</h3><p>Template app single HTML untuk jualan sayur hidroponik. Ubah nama brand, nomor WhatsApp, daftar produk, dan warna sesuai bisnis kamu.</p></div>
+      <div><h4>Menu</h4><p><a href="#produk">Produk</a></p><p><a href="#checkout">Checkout</a></p><p><a href="#admin">Admin</a></p></div>
+      <div><h4>Promo</h4><p>HEMAT10</p><p>FRESH5</p><p>ONGKIR0</p></div>
+      <div><h4>Kontak</h4><p>WhatsApp: 6281234567890</p><p>Jam: 06.00 - 20.00</p></div>
+    </div>
+  </footer>
+  <script>
+    const DEFAULT_PRODUCTS = [
+      {
+            "id": "P001",
+            "name": "Selada Romaine Hidroponik",
+            "cat": "Daun",
+            "price": 18000,
+            "stock": 45,
+            "unit": "250 g",
+            "emoji": "🥬",
+            "tag": "Best Seller",
+            "desc": "Daun renyah, cocok untuk salad, burger, dan menu diet harian.",
+            "nutrition": "Vitamin A, K, folat",
+            "harvest": "Pagi ini",
+            "rating": 4.9
+      },
+      {
+            "id": "P002",
+            "name": "Selada Keriting Hijau",
+            "cat": "Daun",
+            "price": 15000,
+            "stock": 52,
+            "unit": "250 g",
+            "emoji": "🥬",
+            "tag": "Segar",
+            "desc": "Selada keriting hidroponik dengan rasa ringan dan tekstur crunchy.",
+            "nutrition": "Serat, vitamin C",
+            "harvest": "Pagi ini",
+            "rating": 4.8
+      },
+      {
+            "id": "P003",
+            "name": "Selada Keriting Merah",
+            "cat": "Daun",
+            "price": 17000,
+            "stock": 37,
+            "unit": "250 g",
+            "emoji": "🥬",
+            "tag": "Premium",
+            "desc": "Warna cantik untuk plating dan salad premium.",
+            "nutrition": "Antosianin, serat",
+            "harvest": "Kemarin",
+            "rating": 4.7
+      },
+      {
+            "id": "P004",
+            "name": "Pakcoy Hidroponik",
+            "cat": "Daun",
+            "price": 12000,
+            "stock": 68,
+            "unit": "300 g",
+            "emoji": "🥬",
+            "tag": "Hemat",
+            "desc": "Pakcoy segar untuk tumis, sup, dan masakan rumahan.",
+            "nutrition": "Vitamin C, kalsium",
+            "harvest": "Pagi ini",
+            "rating": 4.9
+      },
+      {
+            "id": "P005",
+            "name": "Kangkung Hidroponik",
+            "cat": "Daun",
+            "price": 10000,
+            "stock": 80,
+            "unit": "300 g",
+            "emoji": "🌿",
+            "tag": "Favorit",
+            "desc": "Kangkung bersih, akar minim tanah, cepat dimasak.",
+            "nutrition": "Zat besi, serat",
+            "harvest": "Pagi ini",
+            "rating": 4.8
+      },
+      {
+            "id": "P006",
+            "name": "Bayam Hijau Hidroponik",
+            "cat": "Daun",
+            "price": 11000,
+            "stock": 63,
+            "unit": "250 g",
+            "emoji": "🌿",
+            "tag": "Sehat",
+            "desc": "Bayam lembut untuk bening, tumis, dan MPASI.",
+            "nutrition": "Zat besi, folat",
+            "harvest": "Pagi ini",
+            "rating": 4.8
+      },
+      {
+            "id": "P007",
+            "name": "Bayam Merah Hidroponik",
+            "cat": "Daun",
+            "price": 13000,
+            "stock": 42,
+            "unit": "250 g",
+            "emoji": "🌿",
+            "tag": "Nutrisi",
+            "desc": "Bayam merah warna menarik, bagus untuk menu sehat keluarga.",
+            "nutrition": "Antioksidan, zat besi",
+            "harvest": "Kemarin",
+            "rating": 4.7
+      },
+      {
+            "id": "P008",
+            "name": "Sawi Hijau Hidroponik",
+            "cat": "Daun",
+            "price": 11000,
+            "stock": 74,
+            "unit": "300 g",
+            "emoji": "🥬",
+            "tag": "Harian",
+            "desc": "Sawi hijau segar untuk mie ayam, tumis, dan capcay.",
+            "nutrition": "Vitamin K, C",
+            "harvest": "Pagi ini",
+            "rating": 4.6
+      },
+      {
+            "id": "P009",
+            "name": "Kailan Hidroponik",
+            "cat": "Daun",
+            "price": 16000,
+            "stock": 36,
+            "unit": "250 g",
+            "emoji": "🥦",
+            "tag": "Premium",
+            "desc": "Kailan muda dengan batang renyah dan daun manis.",
+            "nutrition": "Kalsium, vitamin C",
+            "harvest": "Pagi ini",
+            "rating": 4.9
+      },
+      {
+            "id": "P010",
+            "name": "Caisim Hidroponik",
+            "cat": "Daun",
+            "price": 10500,
+            "stock": 91,
+            "unit": "300 g",
+            "emoji": "🥬",
+            "tag": "Murah",
+            "desc": "Caisim bersih untuk mie, bakso, dan sayur harian.",
+            "nutrition": "Serat, vitamin B",
+            "harvest": "Pagi ini",
+            "rating": 4.6
+      },
+      {
+            "id": "P011",
+            "name": "Mint Hidroponik",
+            "cat": "Herbal",
+            "price": 9000,
+            "stock": 33,
+            "unit": "50 g",
+            "emoji": "🌱",
+            "tag": "Aromatik",
+            "desc": "Daun mint segar untuk infused water, teh, dan garnish.",
+            "nutrition": "Menthol alami",
+            "harvest": "Pagi ini",
+            "rating": 4.7
+      },
+      {
+            "id": "P012",
+            "name": "Basil Hidroponik",
+            "cat": "Herbal",
+            "price": 14000,
+            "stock": 28,
+            "unit": "50 g",
+            "emoji": "🌱",
+            "tag": "Chef Pick",
+            "desc": "Basil wangi untuk pasta, pizza, pesto, dan salad.",
+            "nutrition": "Minyak atsiri",
+            "harvest": "Pagi ini",
+            "rating": 4.8
+      },
+      {
+            "id": "P013",
+            "name": "Daun Seledri Hidroponik",
+            "cat": "Herbal",
+            "price": 8000,
+            "stock": 40,
+            "unit": "70 g",
+            "emoji": "🌱",
+            "tag": "Aromatik",
+            "desc": "Seledri segar untuk sop, bakso, dan taburan masakan.",
+            "nutrition": "Vitamin K, aroma alami",
+            "harvest": "Pagi ini",
+            "rating": 4.7
+      },
+      {
+            "id": "P014",
+            "name": "Parsley Hidroponik",
+            "cat": "Herbal",
+            "price": 12000,
+            "stock": 25,
+            "unit": "50 g",
+            "emoji": "🌱",
+            "tag": "Garnish",
+            "desc": "Parsley untuk garnish, saus, dan menu western.",
+            "nutrition": "Vitamin C, K",
+            "harvest": "Kemarin",
+            "rating": 4.6
+      },
+      {
+            "id": "P015",
+            "name": "Microgreens Mix",
+            "cat": "Microgreens",
+            "price": 22000,
+            "stock": 22,
+            "unit": "80 g",
+            "emoji": "🌱",
+            "tag": "Superfood",
+            "desc": "Campuran microgreens untuk salad, garnish, dan menu sehat.",
+            "nutrition": "Mikronutrien tinggi",
+            "harvest": "Pagi ini",
+            "rating": 5.0
+      },
+      {
+            "id": "P016",
+            "name": "Microgreens Brokoli",
+            "cat": "Microgreens",
+            "price": 24000,
+            "stock": 18,
+            "unit": "80 g",
+            "emoji": "🌱",
+            "tag": "Premium",
+            "desc": "Microgreens brokoli segar dengan rasa ringan dan tekstur lembut.",
+            "nutrition": "Sulforaphane, vitamin C",
+            "harvest": "Pagi ini",
+            "rating": 4.9
+      },
+      {
+            "id": "P017",
+            "name": "Tomat Cherry Hidroponik",
+            "cat": "Buah Sayur",
+            "price": 25000,
+            "stock": 30,
+            "unit": "250 g",
+            "emoji": "🍅",
+            "tag": "Manis",
+            "desc": "Tomat cherry merah segar, cocok untuk snack sehat dan salad.",
+            "nutrition": "Likopen, vitamin C",
+            "harvest": "Kemarin",
+            "rating": 4.8
+      },
+      {
+            "id": "P018",
+            "name": "Timun Jepang Hidroponik",
+            "cat": "Buah Sayur",
+            "price": 18000,
+            "stock": 27,
+            "unit": "300 g",
+            "emoji": "🥒",
+            "tag": "Crunchy",
+            "desc": "Timun renyah, minim biji, cocok untuk salad dan sushi.",
+            "nutrition": "Air, serat",
+            "harvest": "Pagi ini",
+            "rating": 4.7
+      },
+      {
+            "id": "P019",
+            "name": "Paprika Mini Mix",
+            "cat": "Buah Sayur",
+            "price": 28000,
+            "stock": 16,
+            "unit": "250 g",
+            "emoji": "🫑",
+            "tag": "Warna-warni",
+            "desc": "Paprika mini campur warna untuk tumisan dan topping.",
+            "nutrition": "Vitamin C tinggi",
+            "harvest": "Kemarin",
+            "rating": 4.8
+      },
+      {
+            "id": "P020",
+            "name": "Cabai Rawit Hidroponik",
+            "cat": "Buah Sayur",
+            "price": 12000,
+            "stock": 35,
+            "unit": "100 g",
+            "emoji": "🌶️",
+            "tag": "Pedas",
+            "desc": "Cabai rawit segar dengan pedas konsisten.",
+            "nutrition": "Capsaicin",
+            "harvest": "Pagi ini",
+            "rating": 4.5
+      },
+      {
+            "id": "B001",
+            "name": "Paket Salad Hemat",
+            "cat": "Paket",
+            "price": 45000,
+            "stock": 20,
+            "unit": "1 paket",
+            "emoji": "🥗",
+            "tag": "Bundle",
+            "desc": "Romaine, tomat cherry, timun jepang, dan microgreens mix.",
+            "nutrition": "Serat lengkap",
+            "harvest": "Pagi ini",
+            "rating": 4.9
+      },
+      {
+            "id": "B002",
+            "name": "Paket Tumis Harian",
+            "cat": "Paket",
+            "price": 35000,
+            "stock": 25,
+            "unit": "1 paket",
+            "emoji": "🍳",
+            "tag": "Bundle",
+            "desc": "Pakcoy, kangkung, caisim, dan sawi hijau untuk stok dapur.",
+            "nutrition": "Vitamin harian",
+            "harvest": "Pagi ini",
+            "rating": 4.8
+      },
+      {
+            "id": "B003",
+            "name": "Paket MPASI Hijau",
+            "cat": "Paket",
+            "price": 32000,
+            "stock": 18,
+            "unit": "1 paket",
+            "emoji": "👶",
+            "tag": "Lembut",
+            "desc": "Bayam hijau, pakcoy muda, dan seledri segar pilihan.",
+            "nutrition": "Folat, zat besi",
+            "harvest": "Pagi ini",
+            "rating": 4.7
+      },
+      {
+            "id": "B004",
+            "name": "Paket Resto Mini",
+            "cat": "Paket",
+            "price": 85000,
+            "stock": 12,
+            "unit": "1 paket",
+            "emoji": "🍽️",
+            "tag": "Resto",
+            "desc": "Kailan, basil, parsley, romaine, dan microgreens untuk plating.",
+            "nutrition": "Chef selection",
+            "harvest": "Pagi ini",
+            "rating": 4.9
+      },
+      {
+            "id": "B005",
+            "name": "Paket Detox Infused",
+            "cat": "Paket",
+            "price": 30000,
+            "stock": 15,
+            "unit": "1 paket",
+            "emoji": "🥤",
+            "tag": "Fresh",
+            "desc": "Mint, timun jepang, dan lemon lokal siap infused water.",
+            "nutrition": "Hidrasi, aroma alami",
+            "harvest": "Pagi ini",
+            "rating": 4.6
+      }
+];
+    const VOUCHERS = {
+      HEMAT10: { type: "percent", value: 10, label: "Diskon 10%" },
+      FRESH5: { type: "flat", value: 5000, label: "Potongan Rp5.000" },
+      ONGKIR0: { type: "shipping", value: 999999, label: "Gratis ongkir" }
+    };
+    const ADMIN_WHATSAPP = "6281234567890";
+    const STORAGE_KEYS = {
+      products: "hydrofresh_products_v1",
+      cart: "hydrofresh_cart_v1",
+      orders: "hydrofresh_orders_v1",
+      theme: "hydrofresh_theme_v1"
+    };
+    const rupiah = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    });
+    const qs = selector => document.querySelector(selector);
+    const qsa = selector => [...document.querySelectorAll(selector)];
+    let products = loadProducts();
+    let cart = loadCart();
+    let selectedCategory = "Semua";
+    let appliedCoupon = null;
+    const el = {
+      productGrid: qs("#productGrid"),
+      categoryChips: qs("#categoryChips"),
+      searchInput: qs("#searchInput"),
+      sortSelect: qs("#sortSelect"),
+      stockSelect: qs("#stockSelect"),
+      cartBtn: qs("#cartBtn"),
+      closeCartBtn: qs("#closeCartBtn"),
+      cartDrawer: qs("#cartDrawer"),
+      overlay: qs("#overlay"),
+      cartBadge: qs("#cartBadge"),
+      cartItems: qs("#cartItems"),
+      drawerItemCount: qs("#drawerItemCount"),
+      drawerSubtotal: qs("#drawerSubtotal"),
+      drawerCheckoutBtn: qs("#drawerCheckoutBtn"),
+      checkoutForm: qs("#checkoutForm"),
+      orderPreview: qs("#orderPreview"),
+      subtotalText: qs("#subtotalText"),
+      discountText: qs("#discountText"),
+      shippingText: qs("#shippingText"),
+      totalText: qs("#totalText"),
+      shippingFee: qs("#shippingFee"),
+      couponInput: qs("#couponInput"),
+      applyCouponBtn: qs("#applyCouponBtn"),
+      saveOrderBtn: qs("#saveOrderBtn"),
+      clearCartBtn: qs("#clearCartBtn"),
+      productForm: qs("#productForm"),
+      adminTable: qs("#adminTable"),
+      resetProductsBtn: qs("#resetProductsBtn"),
+      exportBtn: qs("#exportBtn"),
+      historyTable: qs("#historyTable"),
+      clearHistoryBtn: qs("#clearHistoryBtn"),
+      themeBtn: qs("#themeBtn"),
+      resetCatalogBtn: qs("#resetCatalogBtn"),
+      scrollCheckoutBtn: qs("#scrollCheckoutBtn")
+    };
+    function safeJsonParse(value, fallback) {
+      try {
+        return JSON.parse(value) ?? fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+    function saveProducts() {
+      localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(products));
+    }
+    function loadProducts() {
+      const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.products), null);
+      return Array.isArray(saved) && saved.length ? saved : DEFAULT_PRODUCTS;
+    }
+    function saveCart() {
+      localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart));
+    }
+    function loadCart() {
+      const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.cart), []);
+      return Array.isArray(saved) ? saved : [];
+    }
+    function loadOrders() {
+      const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.orders), []);
+      return Array.isArray(saved) ? saved : [];
+    }
+    function saveOrders(orders) {
+      localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders));
+    }
+    function formatMoney(value) {
+      return rupiah.format(Number(value || 0));
+    }
+    function toast(message) {
+      const item = document.createElement("div");
+      item.className = "toast-message";
+      item.textContent = message;
+      qs("#toast").appendChild(item);
+      setTimeout(() => item.remove(), 3200);
+    }
+    function getCategories() {
+      return ["Semua", ...new Set(products.map(product => product.cat))];
+    }
+    function productStatus(product) {
+      if (product.stock <= 0) return { text: "Habis", className: "empty" };
+      if (product.stock <= 20) return { text: "Stok tipis", className: "low" };
+      return { text: "Tersedia", className: "" };
+    }
+    function renderCategories() {
+      el.categoryChips.innerHTML = "";
+      getCategories().forEach(category => {
+        const button = document.createElement("button");
+        button.className = "chip" + (category === selectedCategory ? " active" : "");
+        button.textContent = category;
+        button.addEventListener("click", () => {
+          selectedCategory = category;
+          renderCategories();
+          renderProducts();
+        });
+        el.categoryChips.appendChild(button);
+      });
+    }
+    function filteredProducts() {
+      const keyword = el.searchInput.value.trim().toLowerCase();
+      const stockFilter = el.stockSelect.value;
+      let result = products.filter(product => {
+        const matchCategory = selectedCategory === "Semua" || product.cat === selectedCategory;
+        const searchable = `${product.name} ${product.cat} ${product.desc} ${product.tag}`.toLowerCase();
+        const matchKeyword = !keyword || searchable.includes(keyword);
+        const matchStock =
+          stockFilter === "all" ||
+          (stockFilter === "ready" && product.stock > 20) ||
+          (stockFilter === "low" && product.stock > 0 && product.stock <= 20) ||
+          (stockFilter === "empty" && product.stock <= 0);
+        return matchCategory && matchKeyword && matchStock;
+      });
+      const sort = el.sortSelect.value;
+      result.sort((a, b) => {
+        if (sort === "priceAsc") return a.price - b.price;
+        if (sort === "priceDesc") return b.price - a.price;
+        if (sort === "stockDesc") return b.stock - a.stock;
+        if (sort === "ratingDesc") return b.rating - a.rating;
+        return b.rating * 100 + b.stock - (a.rating * 100 + a.stock);
+      });
+      return result;
+    }
+    function renderProducts() {
+      const items = filteredProducts();
+      el.productGrid.innerHTML = "";
+      if (!items.length) {
+        el.productGrid.innerHTML = `<div class="empty-state">Produk tidak ditemukan. Coba reset filter atau tambah produk dari panel admin.</div>`;
+        return;
+      }
+      items.forEach(product => {
+        const status = productStatus(product);
+        const inCart = cart.find(item => item.id === product.id);
+        const card = document.createElement("article");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-visual">
+            <span class="product-tag">${product.tag || product.cat}</span>
+            <span aria-hidden="true">${product.emoji || "🥬"}</span>
+            <span class="stock-pill ${status.className}">${status.text} • ${product.stock}</span>
+          </div>
+          <div class="product-body">
+            <div>
+              <h3 class="product-name">${product.name}</h3>
+              <div class="product-desc">${product.desc || "Sayur hidroponik segar siap kirim."}</div>
+            </div>
+            <div class="meta-row">
+              <span>${product.unit || "1 pcs"} • ⭐ ${product.rating || 4.7}</span>
+              <span>${product.harvest || "Panen baru"}</span>
+            </div>
+            <div class="meta-row">
+              <span class="price">${formatMoney(product.price)}</span>
+              <span>${product.nutrition || "Nutrisi alami"}</span>
+            </div>
+            <div class="qty-row">
+              <button class="qty-btn" data-action="minus" data-id="${product.id}">−</button>
+              <div class="qty-display">${inCart ? inCart.qty : 0}</div>
+              <button class="qty-btn" data-action="plus" data-id="${product.id}" ${product.stock <= 0 ? "disabled" : ""}>+</button>
+            </div>
+            <button class="btn btn-primary" data-action="add" data-id="${product.id}" ${product.stock <= 0 ? "disabled" : ""}>Tambah ke Keranjang</button>
+          </div>
+        `;
+        el.productGrid.appendChild(card);
+      });
+    }
+    function findProduct(id) {
+      return products.find(product => product.id === id);
+    }
+    function addToCart(id, qty = 1) {
+      const product = findProduct(id);
+      if (!product) return;
+      if (product.stock <= 0) {
+        toast("Stok produk ini habis.");
+        return;
+      }
+      const existing = cart.find(item => item.id === id);
+      const currentQty = existing ? existing.qty : 0;
+      if (currentQty + qty > product.stock) {
+        toast("Jumlah melebihi stok tersedia.");
+        return;
+      }
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id, qty });
+      }
+      saveCart();
+      renderAll();
+      toast(`${product.name} masuk keranjang.`);
+    }
+    function minusFromCart(id) {
+      const existing = cart.find(item => item.id === id);
+      if (!existing) return;
+      existing.qty -= 1;
+      if (existing.qty <= 0) {
+        cart = cart.filter(item => item.id !== id);
+      }
+      saveCart();
+      renderAll();
+    }
+    function removeFromCart(id) {
+      cart = cart.filter(item => item.id !== id);
+      saveCart();
+      renderAll();
+      toast("Produk dihapus dari keranjang.");
+    }
+    function cartDetails() {
+      return cart
+        .map(item => {
+          const product = findProduct(item.id);
+          if (!product) return null;
+          return {
+            ...item,
+            product,
+            lineTotal: item.qty * product.price
+          };
+        })
+        .filter(Boolean);
+    }
+    function getSubtotal() {
+      return cartDetails().reduce((sum, item) => sum + item.lineTotal, 0);
+    }
+    function getShipping() {
+      return Math.max(0, Number(el.shippingFee?.value || 0));
+    }
+    function getDiscount(subtotal, shipping) {
+      if (!appliedCoupon) return 0;
+      const coupon = VOUCHERS[appliedCoupon];
+      if (!coupon) return 0;
+      if (coupon.type === "percent") return Math.round(subtotal * coupon.value / 100);
+      if (coupon.type === "flat") return Math.min(subtotal, coupon.value);
+      if (coupon.type === "shipping") return Math.min(shipping, coupon.value);
+      return 0;
+    }
+    function getTotals() {
+      const subtotal = getSubtotal();
+      const shipping = getShipping();
+      const discount = getDiscount(subtotal, shipping);
+      const total = Math.max(0, subtotal + shipping - discount);
+      return { subtotal, shipping, discount, total };
+    }
+    function renderCart() {
+      const details = cartDetails();
+      const itemCount = details.reduce((sum, item) => sum + item.qty, 0);
+      const subtotal = getSubtotal();
+      el.cartBadge.textContent = itemCount;
+      el.drawerItemCount.textContent = itemCount;
+      el.drawerSubtotal.textContent = formatMoney(subtotal);
+      el.cartItems.innerHTML = "";
+      if (!details.length) {
+        el.cartItems.innerHTML = `<div class="empty-state">Keranjang masih kosong. Pilih sayur dari katalog.</div>`;
+        return;
+      }
+      details.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "cart-item";
+        row.innerHTML = `
+          <div class="cart-emoji">${item.product.emoji || "🥬"}</div>
+          <div>
+            <h4>${item.product.name}</h4>
+            <p>${item.qty} × ${formatMoney(item.product.price)} = ${formatMoney(item.lineTotal)}</p>
+            <div class="hero-actions mt-8">
+              <button class="btn btn-outline btn-small" data-action="cart-minus" data-id="${item.id}">−</button>
+              <button class="btn btn-outline btn-small" data-action="cart-plus" data-id="${item.id}">+</button>
+            </div>
+          </div>
+          <button class="btn btn-danger btn-small" data-action="remove" data-id="${item.id}">Hapus</button>
+        `;
+        el.cartItems.appendChild(row);
+      });
+    }
+    function renderPreview() {
+      const details = cartDetails();
+      el.orderPreview.innerHTML = "";
+      if (!details.length) {
+        el.orderPreview.innerHTML = `<div class="empty-state">Belum ada item. Ringkasan akan muncul setelah produk masuk keranjang.</div>`;
+      } else {
+        details.forEach(item => {
+          const row = document.createElement("div");
+          row.className = "preview-item";
+          row.innerHTML = `
+            <span>${item.product.name}<br><small>${item.qty} × ${formatMoney(item.product.price)}</small></span>
+            <strong>${formatMoney(item.lineTotal)}</strong>
+          `;
+          el.orderPreview.appendChild(row);
+        });
+      }
+      const totals = getTotals();
+      el.subtotalText.textContent = formatMoney(totals.subtotal);
+      el.discountText.textContent = "-" + formatMoney(totals.discount);
+      el.shippingText.textContent = formatMoney(totals.shipping);
+      el.totalText.textContent = formatMoney(totals.total);
+    }
+    function renderAdminTable() {
+      el.adminTable.innerHTML = "";
+      products.forEach(product => {
+        const status = product.stock <= 0 ? ["danger", "Habis"] : product.stock <= 20 ? ["warn", "Stok tipis"] : ["ok", "Ready"];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${product.id}</td>
+          <td>${product.emoji || "🥬"} ${product.name}</td>
+          <td>${product.cat}</td>
+          <td>${formatMoney(product.price)}</td>
+          <td>${product.stock}</td>
+          <td><span class="status ${status[0]}">${status[1]}</span></td>
+          <td>
+            <button class="btn btn-outline btn-small" data-admin="edit" data-id="${product.id}">Edit</button>
+            <button class="btn btn-danger btn-small" data-admin="delete" data-id="${product.id}">Hapus</button>
+          </td>
+        `;
+        el.adminTable.appendChild(row);
+      });
+    }
+    function renderHistory() {
+      const orders = loadOrders();
+      el.historyTable.innerHTML = "";
+      if (!orders.length) {
+        el.historyTable.innerHTML = `<tr><td colspan="5">Belum ada riwayat pesanan.</td></tr>`;
+        return;
+      }
+      orders.slice().reverse().forEach(order => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${order.date}</td>
+          <td>${order.customer.name}<br><small>${order.customer.phone}</small></td>
+          <td>${order.items.length} item</td>
+          <td>${formatMoney(order.total)}</td>
+          <td>${order.customer.payment}</td>
+        `;
+        el.historyTable.appendChild(row);
+      });
+    }
+    function renderAll() {
+      renderCategories();
+      renderProducts();
+      renderCart();
+      renderPreview();
+      renderAdminTable();
+      renderHistory();
+    }
+    function openCart() {
+      el.cartDrawer.classList.add("open");
+      el.overlay.classList.add("open");
+    }
+    function closeCart() {
+      el.cartDrawer.classList.remove("open");
+      el.overlay.classList.remove("open");
+    }
+    function buildOrderObject() {
+      const details = cartDetails();
+      const totals = getTotals();
+      return {
+        id: `ORD-${Date.now()}`,
+        date: new Date().toLocaleString("id-ID"),
+        customer: {
+          name: qs("#customerName").value.trim(),
+          phone: qs("#customerPhone").value.trim(),
+          area: qs("#customerArea").value.trim(),
+          address: qs("#customerAddress").value.trim(),
+          payment: qs("#paymentMethod").value,
+          note: qs("#orderNote").value.trim()
+        },
+        items: details.map(item => ({
+          id: item.id,
+          name: item.product.name,
+          qty: item.qty,
+          unit: item.product.unit,
+          price: item.product.price,
+          lineTotal: item.lineTotal
+        })),
+        subtotal: totals.subtotal,
+        shipping: totals.shipping,
+        discount: totals.discount,
+        total: totals.total,
+        coupon: appliedCoupon
+      };
+    }
+    function validateOrder(order) {
+      if (!order.items.length) {
+        toast("Keranjang masih kosong.");
+        return false;
+      }
+      if (!order.customer.name || !order.customer.phone || !order.customer.address) {
+        toast("Lengkapi nama, nomor HP, dan alamat.");
+        return false;
+      }
+      return true;
+    }
+    function orderToWhatsAppText(order) {
+      const itemLines = order.items
+        .map((item, index) => `${index + 1}. ${item.name} - ${item.qty} ${item.unit} x ${formatMoney(item.price)} = ${formatMoney(item.lineTotal)}`)
+        .join("\n");
+      return [
+        "Halo HydroFresh, saya mau pesan sayur hidroponik:",
+        "",
+        itemLines,
+        "",
+        `Subtotal: ${formatMoney(order.subtotal)}`,
+        `Diskon: ${formatMoney(order.discount)}`,
+        `Ongkir: ${formatMoney(order.shipping)}`,
+        `Total: ${formatMoney(order.total)}`,
+        "",
+        `Nama: ${order.customer.name}`,
+        `No HP: ${order.customer.phone}`,
+        `Kecamatan: ${order.customer.area || "-"}`,
+        `Alamat: ${order.customer.address}`,
+        `Pembayaran: ${order.customer.payment}`,
+        `Catatan: ${order.customer.note || "-"}`,
+        `Voucher: ${order.coupon || "-"}`
+      ].join("\n");
+    }
+    function saveCurrentOrder(showMessage = true) {
+      const order = buildOrderObject();
+      if (!validateOrder(order)) return null;
+      const orders = loadOrders();
+      orders.push(order);
+      saveOrders(orders);
+      renderHistory();
+      if (showMessage) toast("Pesanan disimpan di riwayat lokal.");
+      return order;
+    }
+    function reduceStockAfterOrder(order) {
+      order.items.forEach(item => {
+        const product = findProduct(item.id);
+        if (product) {
+          product.stock = Math.max(0, product.stock - item.qty);
+        }
+      });
+      saveProducts();
+    }
+    function clearCart() {
+      cart = [];
+      appliedCoupon = null;
+      el.couponInput.value = "";
+      saveCart();
+      renderAll();
+    }
+    function resetCheckoutForm() {
+      el.checkoutForm.reset();
+      el.shippingFee.value = 10000;
+    }
+    function fillAdminForm(product) {
+      qs("#adminId").value = product.id;
+      qs("#adminEmoji").value = product.emoji || "";
+      qs("#adminName").value = product.name || "";
+      qs("#adminCat").value = product.cat || "";
+      qs("#adminPrice").value = product.price || 0;
+      qs("#adminStock").value = product.stock || 0;
+      qs("#adminUnit").value = product.unit || "";
+      qs("#adminTag").value = product.tag || "";
+      qs("#adminDesc").value = product.desc || "";
+      location.hash = "#admin";
+      toast("Data produk masuk ke form admin.");
+    }
+    function buildProductFromForm() {
+      const id = qs("#adminId").value.trim() || `P${String(Date.now()).slice(-5)}`;
+      return {
+        id,
+        emoji: qs("#adminEmoji").value.trim() || "🥬",
+        name: qs("#adminName").value.trim(),
+        cat: qs("#adminCat").value.trim(),
+        price: Number(qs("#adminPrice").value || 0),
+        stock: Number(qs("#adminStock").value || 0),
+        unit: qs("#adminUnit").value.trim() || "1 pcs",
+        tag: qs("#adminTag").value.trim() || "Baru",
+        desc: qs("#adminDesc").value.trim() || "Sayur hidroponik segar siap kirim.",
+        nutrition: "Nutrisi alami",
+        harvest: "Pagi ini",
+        rating: 4.7
+      };
+    }
+    function applySavedTheme() {
+      const theme = localStorage.getItem(STORAGE_KEYS.theme);
+      if (theme === "dark") document.body.classList.add("dark");
+    }
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem(STORAGE_KEYS.theme, document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    function bindEvents() {
+      el.searchInput.addEventListener("input", renderProducts);
+      el.sortSelect.addEventListener("change", renderProducts);
+      el.stockSelect.addEventListener("change", renderProducts);
+      el.cartBtn.addEventListener("click", openCart);
+      el.closeCartBtn.addEventListener("click", closeCart);
+      el.overlay.addEventListener("click", closeCart);
+      el.drawerCheckoutBtn.addEventListener("click", closeCart);
+      el.themeBtn.addEventListener("click", toggleTheme);
+      el.resetCatalogBtn.addEventListener("click", () => {
+        selectedCategory = "Semua";
+        el.searchInput.value = "";
+        el.sortSelect.value = "popular";
+        el.stockSelect.value = "all";
+        renderAll();
+      });
+      el.scrollCheckoutBtn.addEventListener("click", () => {
+        location.hash = "#checkout";
+      });
+      document.addEventListener("click", event => {
+        const target = event.target.closest("[data-action]");
+        if (!target) return;
+        const id = target.dataset.id;
+        const action = target.dataset.action;
+        if (action === "add" || action === "plus" || action === "cart-plus") addToCart(id);
+        if (action === "minus" || action === "cart-minus") minusFromCart(id);
+        if (action === "remove") removeFromCart(id);
+      });
+      document.addEventListener("click", event => {
+        const target = event.target.closest("[data-admin]");
+        if (!target) return;
+        const product = findProduct(target.dataset.id);
+        if (!product) return;
+        if (target.dataset.admin === "edit") fillAdminForm(product);
+        if (target.dataset.admin === "delete") {
+          products = products.filter(item => item.id !== product.id);
+          cart = cart.filter(item => item.id !== product.id);
+          saveProducts();
+          saveCart();
+          renderAll();
+          toast("Produk dihapus.");
+        }
+      });
+      el.shippingFee.addEventListener("input", renderPreview);
+      el.applyCouponBtn.addEventListener("click", () => {
+        const code = el.couponInput.value.trim().toUpperCase();
+        if (!VOUCHERS[code]) {
+          appliedCoupon = null;
+          renderPreview();
+          toast("Kode voucher tidak valid.");
+          return;
+        }
+        appliedCoupon = code;
+        renderPreview();
+        toast(`Voucher ${code} diterapkan.`);
+      });
+      el.checkoutForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const order = saveCurrentOrder(false);
+        if (!order) return;
+        reduceStockAfterOrder(order);
+        const text = encodeURIComponent(orderToWhatsAppText(order));
+        const url = `https://wa.me/${ADMIN_WHATSAPP}?text=${text}`;
+        window.open(url, "_blank");
+        clearCart();
+        resetCheckoutForm();
+        renderAll();
+        toast("Pesanan siap dikirim ke WhatsApp.");
+      });
+      el.saveOrderBtn.addEventListener("click", () => {
+        const order = saveCurrentOrder(true);
+        if (order) {
+          reduceStockAfterOrder(order);
+          clearCart();
+          resetCheckoutForm();
+          renderAll();
+        }
+      });
+      el.clearCartBtn.addEventListener("click", () => {
+        clearCart();
+        toast("Keranjang dikosongkan.");
+      });
+      el.productForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const product = buildProductFromForm();
+        if (!product.name || !product.cat || product.price <= 0) {
+          toast("Nama, kategori, dan harga wajib benar.");
+          return;
+        }
+        const existingIndex = products.findIndex(item => item.id === product.id);
+        if (existingIndex >= 0) {
+          products[existingIndex] = { ...products[existingIndex], ...product };
+        } else {
+          products.unshift(product);
+        }
+        saveProducts();
+        el.productForm.reset();
+        renderAll();
+        toast("Produk tersimpan.");
+      });
+      el.resetProductsBtn.addEventListener("click", () => {
+        products = DEFAULT_PRODUCTS.map(product => ({ ...product }));
+        cart = [];
+        saveProducts();
+        saveCart();
+        renderAll();
+        toast("Produk kembali ke data awal.");
+      });
+      el.exportBtn.addEventListener("click", () => {
+        const payload = {
+          products,
+          orders: loadOrders(),
+          exportedAt: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = "hydrofresh-data.json";
+        anchor.click();
+        URL.revokeObjectURL(url);
+      });
+      el.clearHistoryBtn.addEventListener("click", () => {
+        saveOrders([]);
+        renderHistory();
+        toast("Riwayat pesanan dihapus.");
+      });
+    }
+    applySavedTheme();
+    bindEvents();
+    renderAll();
+
+    /*
+      Catatan pengembangan:
+      - File ini sengaja dibuat single HTML agar mudah dipindahkan ke hosting statis.
+      - Untuk produksi, data bisa dipindahkan ke database seperti Supabase, Firebase, atau backend sendiri.
+      - Nomor WhatsApp admin dapat diganti pada konstanta ADMIN_WHATSAPP.
+      - Data localStorage tersimpan di browser pengguna, bukan server.
+    */
+    const BUSINESS_TIP_1 = "Gunakan foto produk asli untuk meningkatkan kepercayaan pembeli.";
+    const BUSINESS_TIP_2 = "Tambahkan label panen hari ini pada produk yang paling segar.";
+    const BUSINESS_TIP_3 = "Gunakan voucher terbatas untuk menaikkan konversi checkout.";
+    const BUSINESS_TIP_4 = "Pastikan alamat pengiriman wajib agar admin tidak bolak-balik bertanya.";
+    const BUSINESS_TIP_5 = "Sediakan paket bundle untuk menaikkan nilai transaksi.";
+    const BUSINESS_TIP_6 = "Tampilkan stok tipis agar pembeli merasa perlu cepat checkout.";
+    const BUSINESS_TIP_7 = "Simpan riwayat order untuk melihat produk yang paling sering laku.";
+    const BUSINESS_TIP_8 = "Gunakan testimoni singkat dan spesifik dari pelanggan.";
+    const BUSINESS_TIP_9 = "Pisahkan kategori daun, herbal, microgreens, dan paket.";
+    const BUSINESS_TIP_10 = "Gunakan warna hijau untuk membangun asosiasi segar dan sehat.";
+    const BUSINESS_TIP_11 = "Gunakan tombol WhatsApp karena pelanggan Indonesia familiar dengannya.";
+    const BUSINESS_TIP_12 = "Pastikan tombol utama terlihat jelas di layar HP.";
+    const BUSINESS_TIP_13 = "Harga per satuan harus selalu jelas.";
+    const BUSINESS_TIP_14 = "Buat deskripsi pendek agar katalog tidak terasa berat.";
+    const BUSINESS_TIP_15 = "Buat admin panel sederhana agar pemilik usaha bisa update cepat.";
+    function calculateAverageRating() {
+      if (!products.length) return 0;
+      const total = products.reduce((sum, product) => sum + Number(product.rating || 0), 0);
+      return Math.round((total / products.length) * 10) / 10;
+    }
+    function countAvailableProducts() {
+      return products.filter(product => product.stock > 0).length;
+    }
+    function countLowStockProducts() {
+      return products.filter(product => product.stock > 0 && product.stock <= 20).length;
+    }
+    function countEmptyProducts() {
+      return products.filter(product => product.stock <= 0).length;
+    }
+    function getTopProductsByRating(limit = 5) {
+      return products
+        .slice()
+        .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
+        .slice(0, limit);
+    }
+    function getCheapestProducts(limit = 5) {
+      return products
+        .slice()
+        .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))
+        .slice(0, limit);
+    }
+    function getPremiumProducts(limit = 5) {
+      return products
+        .slice()
+        .sort((a, b) => Number(b.price || 0) - Number(a.price || 0))
+        .slice(0, limit);
+    }
+    function getProductsByCategory(category) {
+      return products.filter(product => product.cat === category);
+    }
+    function generateSku(prefix = "HYDRO") {
+      const random = Math.random().toString(36).slice(2, 7).toUpperCase();
+      return `${prefix}-${random}`;
+    }
+    function estimatePackingTime(itemCount) {
+      if (itemCount <= 3) return "10-15 menit";
+      if (itemCount <= 8) return "20-30 menit";
+      return "30-45 menit";
+    }
+    function estimateDelivery(area) {
+      const normalized = String(area || "").toLowerCase();
+      if (normalized.includes("panakkukang")) return "30-60 menit";
+      if (normalized.includes("rappocini")) return "40-70 menit";
+      if (normalized.includes("tamalanrea")) return "60-90 menit";
+      if (normalized.includes("biringkanaya")) return "70-100 menit";
+      return "60-120 menit";
+    }
+    function getSuggestedVoucher(subtotal) {
+      if (subtotal >= 100000) return "HEMAT10";
+      if (subtotal >= 50000) return "FRESH5";
+      return null;
+    }
+    function normalizePhone(phone) {
+      let value = String(phone || "").replace(/\D/g, "");
+      if (value.startsWith("0")) value = "62" + value.slice(1);
+      return value;
+    }
+    function createShareableCatalogText() {
+      return products
+        .filter(product => product.stock > 0)
+        .map(product => `${product.emoji || "🥬"} ${product.name} - ${formatMoney(product.price)} / ${product.unit}`)
+        .join("\n");
+    }
+    function printCatalog() {
+      const text = createShareableCatalogText();
+      console.log("Katalog HydroFresh:\n" + text);
+    }
+    const PRODUCT_CARE_GUIDE = [
+      {
+        name: "Selada",
+        method: "Simpan di wadah tertutup dengan tisu kering.",
+        shelfLife: "3-5 hari"
+      },
+      {
+        name: "Pakcoy",
+        method: "Bungkus pangkal dengan tisu lembap tipis.",
+        shelfLife: "3-4 hari"
+      },
+      {
+        name: "Kangkung",
+        method: "Simpan dalam plastik berlubang di chiller.",
+        shelfLife: "2-3 hari"
+      },
+      {
+        name: "Bayam",
+        method: "Jangan dicuci sebelum disimpan agar tidak cepat layu.",
+        shelfLife: "2-3 hari"
+      },
+      {
+        name: "Kailan",
+        method: "Pisahkan daun rusak dan simpan di suhu dingin.",
+        shelfLife: "3-4 hari"
+      },
+      {
+        name: "Herbal",
+        method: "Masukkan batang ke air sedikit lalu tutup longgar.",
+        shelfLife: "4-7 hari"
+      },
+      {
+        name: "Microgreens",
+        method: "Simpan kering dan ambil sesuai kebutuhan.",
+        shelfLife: "2-4 hari"
+      },
+      {
+        name: "Tomat Cherry",
+        method: "Simpan di suhu ruang jika akan dimakan cepat.",
+        shelfLife: "4-6 hari"
+      },
+      {
+        name: "Timun Jepang",
+        method: "Bungkus agar tidak kehilangan kelembapan.",
+        shelfLife: "4-7 hari"
+      },
+      {
+        name: "Paprika",
+        method: "Simpan kering di laci sayur kulkas.",
+        shelfLife: "5-7 hari"
+      },
+    ];
+    const DELIVERY_ZONES = [
+      {
+        zone: "Panakkukang",
+        fee: 8000,
+        eta: "30-60 menit"
+      },
+      {
+        zone: "Rappocini",
+        fee: 10000,
+        eta: "40-70 menit"
+      },
+      {
+        zone: "Ujung Pandang",
+        fee: 12000,
+        eta: "45-75 menit"
+      },
+      {
+        zone: "Tamalanrea",
+        fee: 15000,
+        eta: "60-90 menit"
+      },
+      {
+        zone: "Biringkanaya",
+        fee: 18000,
+        eta: "70-100 menit"
+      },
+      {
+        zone: "Manggala",
+        fee: 12000,
+        eta: "45-80 menit"
+      },
+      {
+        zone: "Mariso",
+        fee: 14000,
+        eta: "50-90 menit"
+      },
+      {
+        zone: "Mamajang",
+        fee: 12000,
+        eta: "45-80 menit"
+      },
+      {
+        zone: "Tamalate",
+        fee: 15000,
+        eta: "60-90 menit"
+      },
+      {
+        zone: "Luar Kota",
+        fee: 25000,
+        eta: "menyesuaikan kurir"
+      },
+    ];
+    const PROMOTION_RULES = [
+      {
+        title: "Beli 3 sayur daun",
+        rule: "Tambahkan 1 ikat seledri mini jika stok tersedia."
+      },
+      {
+        title: "Order di atas Rp100.000",
+        rule: "Gunakan voucher HEMAT10."
+      },
+      {
+        title: "Order pertama",
+        rule: "Gunakan voucher FRESH5."
+      },
+      {
+        title: "Area dekat kebun",
+        rule: "Berikan opsi ambil sendiri."
+      },
+      {
+        title: "Langganan mingguan",
+        rule: "Buat jadwal panen tetap."
+      },
+      {
+        title: "Restoran",
+        rule: "Tawarkan paket Resto Mini."
+      },
+      {
+        title: "Keluarga",
+        rule: "Tawarkan Paket Tumis Harian."
+      },
+      {
+        title: "Diet sehat",
+        rule: "Tawarkan Paket Salad Hemat."
+      },
+    ];
+  </script>
+  <template id="developer-notes">
+    <section data-note="1">
+      <h3>Catatan Pengembangan 1</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="2">
+      <h3>Catatan Pengembangan 2</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="3">
+      <h3>Catatan Pengembangan 3</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="4">
+      <h3>Catatan Pengembangan 4</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="5">
+      <h3>Catatan Pengembangan 5</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="6">
+      <h3>Catatan Pengembangan 6</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="7">
+      <h3>Catatan Pengembangan 7</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="8">
+      <h3>Catatan Pengembangan 8</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="9">
+      <h3>Catatan Pengembangan 9</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="10">
+      <h3>Catatan Pengembangan 10</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="11">
+      <h3>Catatan Pengembangan 11</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="12">
+      <h3>Catatan Pengembangan 12</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="13">
+      <h3>Catatan Pengembangan 13</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="14">
+      <h3>Catatan Pengembangan 14</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="15">
+      <h3>Catatan Pengembangan 15</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="16">
+      <h3>Catatan Pengembangan 16</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="17">
+      <h3>Catatan Pengembangan 17</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="18">
+      <h3>Catatan Pengembangan 18</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="19">
+      <h3>Catatan Pengembangan 19</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="20">
+      <h3>Catatan Pengembangan 20</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="21">
+      <h3>Catatan Pengembangan 21</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="22">
+      <h3>Catatan Pengembangan 22</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="23">
+      <h3>Catatan Pengembangan 23</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="24">
+      <h3>Catatan Pengembangan 24</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="25">
+      <h3>Catatan Pengembangan 25</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="26">
+      <h3>Catatan Pengembangan 26</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="27">
+      <h3>Catatan Pengembangan 27</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="28">
+      <h3>Catatan Pengembangan 28</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="29">
+      <h3>Catatan Pengembangan 29</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="30">
+      <h3>Catatan Pengembangan 30</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="31">
+      <h3>Catatan Pengembangan 31</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="32">
+      <h3>Catatan Pengembangan 32</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="33">
+      <h3>Catatan Pengembangan 33</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="34">
+      <h3>Catatan Pengembangan 34</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="35">
+      <h3>Catatan Pengembangan 35</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="36">
+      <h3>Catatan Pengembangan 36</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="37">
+      <h3>Catatan Pengembangan 37</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="38">
+      <h3>Catatan Pengembangan 38</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="39">
+      <h3>Catatan Pengembangan 39</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="40">
+      <h3>Catatan Pengembangan 40</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="41">
+      <h3>Catatan Pengembangan 41</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="42">
+      <h3>Catatan Pengembangan 42</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="43">
+      <h3>Catatan Pengembangan 43</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="44">
+      <h3>Catatan Pengembangan 44</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="45">
+      <h3>Catatan Pengembangan 45</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="46">
+      <h3>Catatan Pengembangan 46</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="47">
+      <h3>Catatan Pengembangan 47</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="48">
+      <h3>Catatan Pengembangan 48</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="49">
+      <h3>Catatan Pengembangan 49</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="50">
+      <h3>Catatan Pengembangan 50</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="51">
+      <h3>Catatan Pengembangan 51</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="52">
+      <h3>Catatan Pengembangan 52</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="53">
+      <h3>Catatan Pengembangan 53</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="54">
+      <h3>Catatan Pengembangan 54</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="55">
+      <h3>Catatan Pengembangan 55</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="56">
+      <h3>Catatan Pengembangan 56</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="57">
+      <h3>Catatan Pengembangan 57</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="58">
+      <h3>Catatan Pengembangan 58</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="59">
+      <h3>Catatan Pengembangan 59</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="60">
+      <h3>Catatan Pengembangan 60</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="61">
+      <h3>Catatan Pengembangan 61</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="62">
+      <h3>Catatan Pengembangan 62</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="63">
+      <h3>Catatan Pengembangan 63</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="64">
+      <h3>Catatan Pengembangan 64</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="65">
+      <h3>Catatan Pengembangan 65</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="66">
+      <h3>Catatan Pengembangan 66</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="67">
+      <h3>Catatan Pengembangan 67</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="68">
+      <h3>Catatan Pengembangan 68</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="69">
+      <h3>Catatan Pengembangan 69</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="70">
+      <h3>Catatan Pengembangan 70</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="71">
+      <h3>Catatan Pengembangan 71</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="72">
+      <h3>Catatan Pengembangan 72</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="73">
+      <h3>Catatan Pengembangan 73</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="74">
+      <h3>Catatan Pengembangan 74</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="75">
+      <h3>Catatan Pengembangan 75</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="76">
+      <h3>Catatan Pengembangan 76</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="77">
+      <h3>Catatan Pengembangan 77</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="78">
+      <h3>Catatan Pengembangan 78</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="79">
+      <h3>Catatan Pengembangan 79</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="80">
+      <h3>Catatan Pengembangan 80</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="81">
+      <h3>Catatan Pengembangan 81</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="82">
+      <h3>Catatan Pengembangan 82</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="83">
+      <h3>Catatan Pengembangan 83</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="84">
+      <h3>Catatan Pengembangan 84</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="85">
+      <h3>Catatan Pengembangan 85</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="86">
+      <h3>Catatan Pengembangan 86</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="87">
+      <h3>Catatan Pengembangan 87</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="88">
+      <h3>Catatan Pengembangan 88</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="89">
+      <h3>Catatan Pengembangan 89</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="90">
+      <h3>Catatan Pengembangan 90</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="91">
+      <h3>Catatan Pengembangan 91</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="92">
+      <h3>Catatan Pengembangan 92</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="93">
+      <h3>Catatan Pengembangan 93</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="94">
+      <h3>Catatan Pengembangan 94</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="95">
+      <h3>Catatan Pengembangan 95</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="96">
+      <h3>Catatan Pengembangan 96</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="97">
+      <h3>Catatan Pengembangan 97</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="98">
+      <h3>Catatan Pengembangan 98</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="99">
+      <h3>Catatan Pengembangan 99</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="100">
+      <h3>Catatan Pengembangan 100</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="101">
+      <h3>Catatan Pengembangan 101</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="102">
+      <h3>Catatan Pengembangan 102</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="103">
+      <h3>Catatan Pengembangan 103</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="104">
+      <h3>Catatan Pengembangan 104</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="105">
+      <h3>Catatan Pengembangan 105</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="106">
+      <h3>Catatan Pengembangan 106</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="107">
+      <h3>Catatan Pengembangan 107</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="108">
+      <h3>Catatan Pengembangan 108</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="109">
+      <h3>Catatan Pengembangan 109</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="110">
+      <h3>Catatan Pengembangan 110</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="111">
+      <h3>Catatan Pengembangan 111</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="112">
+      <h3>Catatan Pengembangan 112</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="113">
+      <h3>Catatan Pengembangan 113</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="114">
+      <h3>Catatan Pengembangan 114</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="115">
+      <h3>Catatan Pengembangan 115</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="116">
+      <h3>Catatan Pengembangan 116</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="117">
+      <h3>Catatan Pengembangan 117</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="118">
+      <h3>Catatan Pengembangan 118</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="119">
+      <h3>Catatan Pengembangan 119</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="120">
+      <h3>Catatan Pengembangan 120</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="121">
+      <h3>Catatan Pengembangan 121</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="122">
+      <h3>Catatan Pengembangan 122</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="123">
+      <h3>Catatan Pengembangan 123</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="124">
+      <h3>Catatan Pengembangan 124</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="125">
+      <h3>Catatan Pengembangan 125</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="126">
+      <h3>Catatan Pengembangan 126</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="127">
+      <h3>Catatan Pengembangan 127</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="128">
+      <h3>Catatan Pengembangan 128</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="129">
+      <h3>Catatan Pengembangan 129</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="130">
+      <h3>Catatan Pengembangan 130</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="131">
+      <h3>Catatan Pengembangan 131</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="132">
+      <h3>Catatan Pengembangan 132</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="133">
+      <h3>Catatan Pengembangan 133</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="134">
+      <h3>Catatan Pengembangan 134</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="135">
+      <h3>Catatan Pengembangan 135</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="136">
+      <h3>Catatan Pengembangan 136</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="137">
+      <h3>Catatan Pengembangan 137</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="138">
+      <h3>Catatan Pengembangan 138</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="139">
+      <h3>Catatan Pengembangan 139</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="140">
+      <h3>Catatan Pengembangan 140</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="141">
+      <h3>Catatan Pengembangan 141</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="142">
+      <h3>Catatan Pengembangan 142</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="143">
+      <h3>Catatan Pengembangan 143</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="144">
+      <h3>Catatan Pengembangan 144</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="145">
+      <h3>Catatan Pengembangan 145</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="146">
+      <h3>Catatan Pengembangan 146</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="147">
+      <h3>Catatan Pengembangan 147</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="148">
+      <h3>Catatan Pengembangan 148</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="149">
+      <h3>Catatan Pengembangan 149</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="150">
+      <h3>Catatan Pengembangan 150</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="151">
+      <h3>Catatan Pengembangan 151</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="152">
+      <h3>Catatan Pengembangan 152</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="153">
+      <h3>Catatan Pengembangan 153</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="154">
+      <h3>Catatan Pengembangan 154</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="155">
+      <h3>Catatan Pengembangan 155</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="156">
+      <h3>Catatan Pengembangan 156</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="157">
+      <h3>Catatan Pengembangan 157</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="158">
+      <h3>Catatan Pengembangan 158</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="159">
+      <h3>Catatan Pengembangan 159</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="160">
+      <h3>Catatan Pengembangan 160</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="161">
+      <h3>Catatan Pengembangan 161</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="162">
+      <h3>Catatan Pengembangan 162</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="163">
+      <h3>Catatan Pengembangan 163</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="164">
+      <h3>Catatan Pengembangan 164</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="165">
+      <h3>Catatan Pengembangan 165</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="166">
+      <h3>Catatan Pengembangan 166</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="167">
+      <h3>Catatan Pengembangan 167</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="168">
+      <h3>Catatan Pengembangan 168</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="169">
+      <h3>Catatan Pengembangan 169</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="170">
+      <h3>Catatan Pengembangan 170</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="171">
+      <h3>Catatan Pengembangan 171</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="172">
+      <h3>Catatan Pengembangan 172</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="173">
+      <h3>Catatan Pengembangan 173</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="174">
+      <h3>Catatan Pengembangan 174</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="175">
+      <h3>Catatan Pengembangan 175</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="176">
+      <h3>Catatan Pengembangan 176</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="177">
+      <h3>Catatan Pengembangan 177</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="178">
+      <h3>Catatan Pengembangan 178</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="179">
+      <h3>Catatan Pengembangan 179</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="180">
+      <h3>Catatan Pengembangan 180</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="181">
+      <h3>Catatan Pengembangan 181</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="182">
+      <h3>Catatan Pengembangan 182</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="183">
+      <h3>Catatan Pengembangan 183</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="184">
+      <h3>Catatan Pengembangan 184</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="185">
+      <h3>Catatan Pengembangan 185</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="186">
+      <h3>Catatan Pengembangan 186</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="187">
+      <h3>Catatan Pengembangan 187</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="188">
+      <h3>Catatan Pengembangan 188</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="189">
+      <h3>Catatan Pengembangan 189</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="190">
+      <h3>Catatan Pengembangan 190</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="191">
+      <h3>Catatan Pengembangan 191</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="192">
+      <h3>Catatan Pengembangan 192</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="193">
+      <h3>Catatan Pengembangan 193</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="194">
+      <h3>Catatan Pengembangan 194</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="195">
+      <h3>Catatan Pengembangan 195</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="196">
+      <h3>Catatan Pengembangan 196</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="197">
+      <h3>Catatan Pengembangan 197</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="198">
+      <h3>Catatan Pengembangan 198</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="199">
+      <h3>Catatan Pengembangan 199</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="200">
+      <h3>Catatan Pengembangan 200</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="201">
+      <h3>Catatan Pengembangan 201</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="202">
+      <h3>Catatan Pengembangan 202</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="203">
+      <h3>Catatan Pengembangan 203</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="204">
+      <h3>Catatan Pengembangan 204</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="205">
+      <h3>Catatan Pengembangan 205</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="206">
+      <h3>Catatan Pengembangan 206</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="207">
+      <h3>Catatan Pengembangan 207</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="208">
+      <h3>Catatan Pengembangan 208</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="209">
+      <h3>Catatan Pengembangan 209</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="210">
+      <h3>Catatan Pengembangan 210</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="211">
+      <h3>Catatan Pengembangan 211</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="212">
+      <h3>Catatan Pengembangan 212</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="213">
+      <h3>Catatan Pengembangan 213</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="214">
+      <h3>Catatan Pengembangan 214</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="215">
+      <h3>Catatan Pengembangan 215</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="216">
+      <h3>Catatan Pengembangan 216</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="217">
+      <h3>Catatan Pengembangan 217</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="218">
+      <h3>Catatan Pengembangan 218</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="219">
+      <h3>Catatan Pengembangan 219</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="220">
+      <h3>Catatan Pengembangan 220</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="221">
+      <h3>Catatan Pengembangan 221</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="222">
+      <h3>Catatan Pengembangan 222</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="223">
+      <h3>Catatan Pengembangan 223</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="224">
+      <h3>Catatan Pengembangan 224</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="225">
+      <h3>Catatan Pengembangan 225</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="226">
+      <h3>Catatan Pengembangan 226</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="227">
+      <h3>Catatan Pengembangan 227</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="228">
+      <h3>Catatan Pengembangan 228</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="229">
+      <h3>Catatan Pengembangan 229</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="230">
+      <h3>Catatan Pengembangan 230</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="231">
+      <h3>Catatan Pengembangan 231</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="232">
+      <h3>Catatan Pengembangan 232</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="233">
+      <h3>Catatan Pengembangan 233</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="234">
+      <h3>Catatan Pengembangan 234</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="235">
+      <h3>Catatan Pengembangan 235</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="236">
+      <h3>Catatan Pengembangan 236</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="237">
+      <h3>Catatan Pengembangan 237</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="238">
+      <h3>Catatan Pengembangan 238</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="239">
+      <h3>Catatan Pengembangan 239</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="240">
+      <h3>Catatan Pengembangan 240</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="241">
+      <h3>Catatan Pengembangan 241</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="242">
+      <h3>Catatan Pengembangan 242</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="243">
+      <h3>Catatan Pengembangan 243</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="244">
+      <h3>Catatan Pengembangan 244</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="245">
+      <h3>Catatan Pengembangan 245</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="246">
+      <h3>Catatan Pengembangan 246</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="247">
+      <h3>Catatan Pengembangan 247</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="248">
+      <h3>Catatan Pengembangan 248</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="249">
+      <h3>Catatan Pengembangan 249</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="250">
+      <h3>Catatan Pengembangan 250</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="251">
+      <h3>Catatan Pengembangan 251</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="252">
+      <h3>Catatan Pengembangan 252</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="253">
+      <h3>Catatan Pengembangan 253</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="254">
+      <h3>Catatan Pengembangan 254</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="255">
+      <h3>Catatan Pengembangan 255</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="256">
+      <h3>Catatan Pengembangan 256</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="257">
+      <h3>Catatan Pengembangan 257</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="258">
+      <h3>Catatan Pengembangan 258</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="259">
+      <h3>Catatan Pengembangan 259</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="260">
+      <h3>Catatan Pengembangan 260</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="261">
+      <h3>Catatan Pengembangan 261</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="262">
+      <h3>Catatan Pengembangan 262</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="263">
+      <h3>Catatan Pengembangan 263</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="264">
+      <h3>Catatan Pengembangan 264</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="265">
+      <h3>Catatan Pengembangan 265</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="266">
+      <h3>Catatan Pengembangan 266</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="267">
+      <h3>Catatan Pengembangan 267</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="268">
+      <h3>Catatan Pengembangan 268</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="269">
+      <h3>Catatan Pengembangan 269</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="270">
+      <h3>Catatan Pengembangan 270</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="271">
+      <h3>Catatan Pengembangan 271</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="272">
+      <h3>Catatan Pengembangan 272</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="273">
+      <h3>Catatan Pengembangan 273</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="274">
+      <h3>Catatan Pengembangan 274</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="275">
+      <h3>Catatan Pengembangan 275</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="276">
+      <h3>Catatan Pengembangan 276</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="277">
+      <h3>Catatan Pengembangan 277</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="278">
+      <h3>Catatan Pengembangan 278</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="279">
+      <h3>Catatan Pengembangan 279</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="280">
+      <h3>Catatan Pengembangan 280</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="281">
+      <h3>Catatan Pengembangan 281</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="282">
+      <h3>Catatan Pengembangan 282</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="283">
+      <h3>Catatan Pengembangan 283</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="284">
+      <h3>Catatan Pengembangan 284</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="285">
+      <h3>Catatan Pengembangan 285</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="286">
+      <h3>Catatan Pengembangan 286</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="287">
+      <h3>Catatan Pengembangan 287</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="288">
+      <h3>Catatan Pengembangan 288</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="289">
+      <h3>Catatan Pengembangan 289</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="290">
+      <h3>Catatan Pengembangan 290</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+    <section data-note="291">
+      <h3>Catatan Pengembangan 291</h3>
+      <p>Gunakan localStorage hanya untuk demo atau toko kecil tanpa akun.</p>
+    </section>
+    <section data-note="292">
+      <h3>Catatan Pengembangan 292</h3>
+      <p>Untuk produksi, pindahkan checkout ke backend agar data lebih aman.</p>
+    </section>
+    <section data-note="293">
+      <h3>Catatan Pengembangan 293</h3>
+      <p>Produk dapat ditambah melalui panel admin tanpa mengedit kode.</p>
+    </section>
+    <section data-note="294">
+      <h3>Catatan Pengembangan 294</h3>
+      <p>Gunakan hosting statis seperti GitHub Pages, Netlify, atau Vercel.</p>
+    </section>
+    <section data-note="295">
+      <h3>Catatan Pengembangan 295</h3>
+      <p>Foto asli produk akan membuat katalog lebih dipercaya.</p>
+    </section>
+    <section data-note="296">
+      <h3>Catatan Pengembangan 296</h3>
+      <p>Tambahkan kebijakan refund dan pengiriman bila toko mulai ramai.</p>
+    </section>
+    <section data-note="297">
+      <h3>Catatan Pengembangan 297</h3>
+      <p>Backup data export JSON secara rutin dari panel admin.</p>
+    </section>
+    <section data-note="298">
+      <h3>Catatan Pengembangan 298</h3>
+      <p>Gunakan voucher musiman untuk promosi panen melimpah.</p>
+    </section>
+    <section data-note="299">
+      <h3>Catatan Pengembangan 299</h3>
+      <p>Pastikan harga, stok, dan satuan selalu diperbarui.</p>
+    </section>
+    <section data-note="300">
+      <h3>Catatan Pengembangan 300</h3>
+      <p>Ubah konstanta ADMIN_WHATSAPP untuk nomor admin toko.</p>
+    </section>
+  </template>
+</body>
+</html>
