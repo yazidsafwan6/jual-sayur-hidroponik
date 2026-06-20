@@ -6,6 +6,7 @@ import { Cart } from "./components/Cart.jsx";
 import { Header } from "./components/Header.jsx";
 import { ProductCard } from "./components/ProductCard.jsx";
 import { products } from "./data/products.js";
+import { formatRupiah } from "./utils/currency.js";
 
 export function App({ dataMode = "local" }) {
   if (dataMode === "convex") {
@@ -18,12 +19,14 @@ export function App({ dataMode = "local" }) {
 function ConvexStore() {
   const remoteProducts = useQuery(api.products.list);
   const seedDefaults = useMutation(api.products.seedDefaults);
+  const [hasSeeded, setHasSeeded] = useState(false);
 
   useEffect(() => {
-    if (remoteProducts && remoteProducts.length === 0) {
+    if (remoteProducts && !hasSeeded) {
       void seedDefaults();
+      setHasSeeded(true);
     }
-  }, [remoteProducts, seedDefaults]);
+  }, [hasSeeded, remoteProducts, seedDefaults]);
 
   const normalizedProducts = useMemo(() => {
     return (remoteProducts ?? products).map((product) => ({
@@ -42,21 +45,25 @@ function ConvexStore() {
 
 function Storefront({ dataMode, storeProducts }) {
   const [query, setQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [cart, setCart] = useState([]);
+
+  const categories = useMemo(() => {
+    return ["Semua", ...new Set(storeProducts.map((product) => product.category))];
+  }, [storeProducts]);
 
   const filteredProducts = useMemo(() => {
     const keyword = query.trim().toLowerCase();
 
-    if (!keyword) {
-      return storeProducts;
-    }
-
     return storeProducts.filter((product) =>
-      `${product.name} ${product.category}`.toLowerCase().includes(keyword),
+      (selectedCategory === "Semua" || product.category === selectedCategory) &&
+      (!keyword ||
+        `${product.name} ${product.category}`.toLowerCase().includes(keyword)),
     );
-  }, [query, storeProducts]);
+  }, [query, selectedCategory, storeProducts]);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   function addToCart(product) {
     setCart((currentCart) => {
@@ -96,16 +103,20 @@ function Storefront({ dataMode, storeProducts }) {
 
   return (
     <main id="top">
-      <Header cartCount={cartCount} />
+      <Header cartCount={cartCount} query={query} onQueryChange={setQuery} />
 
       <section className="hero" aria-labelledby="page-title">
         <div className="heroCopy">
-          <p className="eyebrow">Belajar React dari aplikasi nyata</p>
-          <h1 id="page-title">Jual Sayur Hidroponik</h1>
+          <p className="eyebrow">Marketplace sayur hidroponik</p>
+          <h1 id="page-title">Belanja segar dari kebun lokal</h1>
           <p>
-            Starter ini memecah halaman HTML lama menjadi komponen React, state
-            keranjang, data produk, utility formatter, dan styling terpisah.
+            Pilih sayur, herbal, dan produk premium yang dipanen harian. Semua
+            produk bisa dikelola langsung dari admin panel.
           </p>
+          <div className="heroActions">
+            <a href="#produk">Mulai belanja</a>
+            <a href="#admin">Kelola produk</a>
+          </div>
         </div>
         <div className="heroStats" aria-label="Ringkasan toko">
           <span>
@@ -123,20 +134,45 @@ function Storefront({ dataMode, storeProducts }) {
         </div>
       </section>
 
+      <section className="marketStrip" aria-label="Fitur marketplace">
+        <div>
+          <strong>Gratis packing</strong>
+          <span>Setiap order di atas {formatRupiah(50000)}</span>
+        </div>
+        <div>
+          <strong>Panen pagi</strong>
+          <span>Produk diproses di hari yang sama</span>
+        </div>
+        <div>
+          <strong>Admin ready</strong>
+          <span>CRUD produk dari dashboard toko</span>
+        </div>
+      </section>
+
       <section className="catalogSection" id="produk" aria-labelledby="catalog-title">
         <div className="sectionHeading">
-          <p className="eyebrow">Component practice</p>
-          <h2 id="catalog-title">Katalog Produk</h2>
+          <div>
+            <p className="eyebrow">Katalog</p>
+            <h2 id="catalog-title">Rekomendasi untuk kamu</h2>
+          </div>
+          <div className="cartSummary">
+            <span>{cartCount} item</span>
+            <strong>{formatRupiah(cartTotal)}</strong>
+          </div>
         </div>
 
-        <label className="searchBox">
-          <span>Cari produk</span>
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Contoh: pakcoy"
-          />
-        </label>
+        <div className="categoryRail" aria-label="Kategori produk">
+          {categories.map((category) => (
+            <button
+              className={selectedCategory === category ? "activeCategory" : ""}
+              type="button"
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
 
         <div className="productGrid">
           {filteredProducts.map((product) => (

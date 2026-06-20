@@ -1,23 +1,31 @@
-import { Leaf, ShoppingBasket } from "lucide-react";
+import { Search, ShoppingBasket, Store } from "lucide-react";
 
-export function Header({ cartCount }) {
+export function Header({ cartCount, query, onQueryChange }) {
   return (
     <header className="header">
-      <a className="brand" href="#top" aria-label="HydroFresh">
+      <a className="brand" href="#top" aria-label="HydroMart">
         <span className="brandIcon">
-          <Leaf size={22} />
+          <Store size={22} />
         </span>
         <span>
-          <strong>HydroFresh</strong>
-          <small>React Practice</small>
+          <strong>HydroMart</strong>
+          <small>Fresh daily market</small>
         </span>
       </a>
+
+      <label className="topSearch">
+        <Search size={18} />
+        <input
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder="Cari sayur, herbal, atau paket sehat"
+        />
+      </label>
 
       <nav className="nav" aria-label="Navigasi utama">
         <a href="#produk">Produk</a>
         <a href="#keranjang">Keranjang</a>
         <a href="#admin">Admin</a>
-        <a href="legacy-index.html">HTML lama</a>
       </nav>
 
       <a className="cartLink" href="#keranjang" aria-label={`${cartCount} item di keranjang`}>

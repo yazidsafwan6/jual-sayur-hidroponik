@@ -7,7 +7,7 @@ export function Cart({ items, onIncrease, onDecrease, onRemove }) {
   return (
     <section className="cartPanel" id="keranjang" aria-labelledby="cart-title">
       <div className="sectionHeading">
-        <p className="eyebrow">State practice</p>
+        <p className="eyebrow">Checkout</p>
         <h2 id="cart-title">Keranjang</h2>
       </div>
 

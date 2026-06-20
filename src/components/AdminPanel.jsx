@@ -311,7 +311,7 @@ function ConvexAdminPanel({ products }) {
               <div className="adminTableRow" role="row" key={product.id}>
                 <span>
                   <strong>{product.name}</strong>
-                  <small>{product.category} · {product.unit}</small>
+                  <small>{product.category} - {product.unit}</small>
                 </span>
                 <span>{formatRupiah(product.price)}</span>
                 <span>{product.stock}</span>

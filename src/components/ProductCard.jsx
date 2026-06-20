@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { MapPin, Plus, Star } from "lucide-react";
 import { formatRupiah } from "../utils/currency.js";
 
 export function ProductCard({ product, onAddToCart }) {
@@ -7,9 +7,17 @@ export function ProductCard({ product, onAddToCart }) {
       <img src={product.image} alt={product.name} />
       <div className="productBody">
         <div>
-          <p className="eyebrow">{product.category}</p>
+          <p className="productBadge">{product.category}</p>
           <h3>{product.name}</h3>
-          <p className="muted">{product.unit} · stok {product.stock}</p>
+          <p className="muted">{product.unit} - stok {product.stock}</p>
+          <p className="sellerLine">
+            <MapPin size={14} />
+            Kebun Makassar
+          </p>
+          <p className="ratingLine">
+            <Star size={14} />
+            4.9 - Terjual 120+
+          </p>
         </div>
         <div className="productFooter">
           <strong>{formatRupiah(product.price)}</strong>
