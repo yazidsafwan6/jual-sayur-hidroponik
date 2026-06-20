@@ -17,7 +17,13 @@ Project ini sudah disiapkan untuk Convex Cloud.
 npm run convex:dev
 ```
 
-Setelah punya production deploy key, Vercel akan memakai build command:
+Untuk deploy lokal/frontend-only di Vercel, project memakai build command:
+
+```bash
+npm run build
+```
+
+Setelah punya production deploy key Convex Cloud, build bisa diganti menjadi:
 
 ```bash
 npm run vercel-build
