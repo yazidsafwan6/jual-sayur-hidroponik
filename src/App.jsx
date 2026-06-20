@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { AdminPanel } from "./components/AdminPanel.jsx";
 import { Cart } from "./components/Cart.jsx";
 import { Header } from "./components/Header.jsx";
 import { ProductCard } from "./components/ProductCard.jsx";
@@ -150,6 +151,8 @@ function Storefront({ dataMode, storeProducts }) {
         onDecrease={decreaseQuantity}
         onRemove={removeFromCart}
       />
+
+      <AdminPanel dataMode={dataMode} products={storeProducts} />
     </main>
   );
 }

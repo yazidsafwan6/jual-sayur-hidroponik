@@ -16,6 +16,7 @@ export function Header({ cartCount }) {
       <nav className="nav" aria-label="Navigasi utama">
         <a href="#produk">Produk</a>
         <a href="#keranjang">Keranjang</a>
+        <a href="#admin">Admin</a>
         <a href="legacy-index.html">HTML lama</a>
       </nav>
 

@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./auth";
 
 const starterProducts = [
   {
@@ -49,6 +50,7 @@ export const list = query({
 
 export const create = mutation({
   args: {
+    sessionToken: v.string(),
     name: v.string(),
     category: v.string(),
     price: v.number(),
@@ -57,7 +59,40 @@ export const create = mutation({
     image: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("products", args);
+    await requireAdmin(ctx, args.sessionToken);
+    const { sessionToken, ...product } = args;
+    return await ctx.db.insert("products", product);
+  },
+});
+
+export const update = mutation({
+  args: {
+    sessionToken: v.string(),
+    id: v.id("products"),
+    name: v.string(),
+    category: v.string(),
+    price: v.number(),
+    unit: v.string(),
+    stock: v.number(),
+    image: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
+    const { sessionToken, id, ...product } = args;
+    await ctx.db.patch(id, product);
+    return { ok: true };
+  },
+});
+
+export const remove = mutation({
+  args: {
+    sessionToken: v.string(),
+    id: v.id("products"),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
+    await ctx.db.delete(args.id);
+    return { ok: true };
   },
 });
 

@@ -49,6 +49,11 @@ button:hover {
   background: #1d6533;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -169,7 +174,8 @@ main {
 }
 
 .catalogSection,
-.cartPanel {
+.cartPanel,
+.adminPanel {
   padding: 2rem;
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(24, 51, 34, 0.12);
@@ -182,6 +188,10 @@ main {
 }
 
 .cartPanel {
+  margin-bottom: 3rem;
+}
+
+.adminPanel {
   margin-bottom: 3rem;
 }
 
@@ -231,6 +241,118 @@ main {
   border-radius: 8px;
   padding: 0.7rem 0.85rem;
   background: #ffffff;
+}
+
+.adminForm {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.compactForm {
+  max-width: 520px;
+}
+
+.productEditor {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adminForm label {
+  display: grid;
+  gap: 0.45rem;
+  color: #4d5a50;
+  font-weight: 800;
+}
+
+.adminForm input {
+  min-height: 2.75rem;
+  width: 100%;
+  border: 1px solid #cbd9cd;
+  border-radius: 8px;
+  padding: 0.68rem 0.85rem;
+  background: #ffffff;
+}
+
+.wideField,
+.adminActions {
+  grid-column: 1 / -1;
+}
+
+.adminActions,
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.secondaryButton {
+  color: #24402d;
+  background: #e9f7e5;
+}
+
+.secondaryButton:hover {
+  background: #d8efd2;
+}
+
+.dangerButton,
+.rowActions .dangerButton {
+  background: #a43737;
+}
+
+.dangerButton:hover,
+.rowActions .dangerButton:hover {
+  background: #842c2c;
+}
+
+.adminNotice,
+.adminMessage {
+  margin: 0;
+  color: #59665c;
+}
+
+.adminMessage {
+  margin-top: 1rem;
+  font-weight: 800;
+}
+
+.adminTable {
+  overflow: hidden;
+  border: 1px solid #dfe9df;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.adminTableHead,
+.adminTableRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 140px 90px 120px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+}
+
+.adminTableHead {
+  color: #59665c;
+  background: #f2f8ef;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.adminTableRow + .adminTableRow {
+  border-top: 1px solid #edf3ec;
+}
+
+.adminTableRow small {
+  display: block;
+  margin-top: 0.22rem;
+  color: #6b786e;
+}
+
+.rowActions button {
+  width: 2.35rem;
+  min-height: 2.35rem;
+  padding: 0;
 }
 
 .productGrid {
@@ -375,12 +497,31 @@ main {
   }
 
   .catalogSection,
-  .cartPanel {
+  .cartPanel,
+  .adminPanel {
     padding: 1rem;
   }
 
   .cartItem,
   .quantityControl {
     justify-content: space-between;
+  }
+
+  .productEditor,
+  .adminTableHead,
+  .adminTableRow {
+    grid-template-columns: 1fr;
+  }
+
+  .adminTableHead {
+    display: none;
+  }
+
+  .adminTableRow {
+    gap: 0.75rem;
+  }
+
+  .rowActions {
+    justify-content: flex-start;
   }
 }

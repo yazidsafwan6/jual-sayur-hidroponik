@@ -10,4 +10,9 @@ export default defineSchema({
     stock: v.number(),
     image: v.string(),
   }).index("by_category", ["category"]),
+  adminSessions: defineTable({
+    email: v.string(),
+    token: v.string(),
+    expiresAt: v.number(),
+  }).index("by_token", ["token"]),
 });
